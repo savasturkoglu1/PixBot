@@ -102,10 +102,10 @@ class Signal:
         
         if kwargs['signal_filter'] == 'ADX':
 
-            if  data['adx_pos']>data['adx_neg'] and data['adx']>10:
+            if  data['adx_pos']>data['adx_neg'] and data['adx']>15:
                     
                     self.signal_filter=1
-            elif  data['adx_pos']<data['adx_neg'] and data['adx']>10:
+            elif  data['adx_pos']<data['adx_neg'] and data['adx']>15:
                     self.signal_filter =0  
             else:
                 self.signal_filter = None
@@ -143,7 +143,7 @@ class Signal:
         ## treshold filter for only ema strategy
         elif kwargs['signal_filter'] == 'TRS':            
           
-            self.signal_filter = 2 if np.abs(data['ema_short']-data['ema_mid'])/data['ema_mid']*100>0.15 else None
+            self.signal_filter = 2 if np.abs(data['ema_short']-data['ema_mid'])/data['ema_mid']*100>0.30 else None
         else:
             self.signal_filter =2
 
