@@ -13,12 +13,9 @@ class Trade:
         ## objects
         self.client = client
         self.symbol = coin
-        #self.df     = DataBase()
-        self.Logs = Logs()
-              
-
+    
         ## order constants
-        self.marginRate = 50
+        self.marginRate = 90
         self.stopRate = 2
         self.profitRate = 7
         
@@ -33,6 +30,7 @@ class Trade:
         self.profitOrderId = None
         self.profitOrder = None
         self.profitLimit = 0
+        self.profitPrice = None
 
         ## stop order
         self.stopSide = None
@@ -40,6 +38,7 @@ class Trade:
         self.stopOrderId = None
         self.stopOrder = None
         self.setStopStatus = False
+        self.stopPrice = None
         
         ## trade order
         self.position = None 
@@ -48,6 +47,7 @@ class Trade:
         self.tradeMargin =0
         self.quantity = 0        
         self.tradePrice = 0
+        self.tradeClosePrice =0
         self.buyPrice = 0
         self.sellPrice = 0
         self.order = None
@@ -56,254 +56,169 @@ class Trade:
         self.orderId = None
         self.forceTrade = False
         self.forceTradeCount =0
+        self.triggerSide = None
 
-        
-        
-    def _trade(self):
-        pass
-    
-    def _order(self, **kwargs):
-        self._checkPosition()
-        if kwargs['order_type'] == 'OPEN_LONG':
-
-    @classmethod
-    def _setPrice(self, price, trade_type = 'LONG'):
-        self._setLeverage()
-        self._checkBalance()
-        self.quantity = round((self.tradeMargin/price)*self.leverage)    
-        self.tradePrice = price
-        self.side = 'BUY' if trade_type== 'LONG' else  'SELL' 
-        ## set stop     
-        self.stopLimit = round((100-self.stopRate)*price/100,3) if trade_type== 'LONG' else round((100+self.stopRate)*price/100,3)
-
-        self.stopSide = 'SELL' if trade_type== 'LONG' else  'BUY'
-
-        ## set profit
-        self.profitLimit = round((100+self.profitRate)*price/100,3) if trade_type== 'LONG' else round((100-self.profitRate)*price/100,3)
-        self.profitSide = 'SELL' if trade_type== 'LONG' else  'BUY'
-
-    def _checkBalance(self):
-        balance = self.client.futures_account_balance()
-        usdt_balance = [d for d in balance if d['asset'] == 'USDT']
-        balanceUsdt=usdt_balance[0]['withdrawAvailable']
-        self.balance =float(balanceUsdt)
-        self.tradeMargin =self.marginRate*(float(balanceUsdt)/100)
         
 
     def _live(self, data):
         if self.order is not  None:
             if self.orderStatus !='FILLED':
                 self._checkOrder()
-            if self.setStopStatus == False and self.takeProfit == False:
+            if self.setStopStatus is False:
                 self._setStop()
-            if self.takeProfitStatus == False:
+            if self.takeProfitStatus is False:
                 self._takeProfit()
-            if self.takeProfitStatus == True:
-                self._checkProfit()    
-        if self.forceTrade:
-            if self.orderStatus != 'FILLED':                              
-                    self._forceTrade()
-
-    def _forceTrade(self):
-        if self.forceTradeCount == 0:
-            order_type = self.order['side']
-            self._cancelOrder(self.order)
-            if order_type == 'BUY':
-                self._buy(self.tradePrice)
-            if order_type == 'SELL':
-                self._sell(self.tradePrice)
-
-        else:
-            self.forceTradeCount = self.forceTradeCount-1
-
-    def _buy(self, buy_price=0, side='OPEN', trade_type = 'MARKET', force_trade = False, force_trade_count =3):
-         ## check current  position
-         self._checkPosition()
-         if self.position==1: 
-                return
-         if self.position ==0:
-                side = 'CLOSE'
-         if self.position is None:
-                if side== 'TWO_WAY':
-                   side = 'OPEN'       
-         if side =='CLOSE':
-            if self.position !=0:
-                 return         
-         ##set trade constants
-         self.buyPrice = buy_price        
-         self.forceTrade = force_trade
-         self.forceTradeCount = force_trade_count
-         
-         if side =='OPEN':     
-           self._setPrice(buy_price)
-         else:
-               self.takeProfit = True 
-              
-
-
-         ## set params according market type
-         
-         params = dict( 
+            if self.takeProfitStatus is True:
+                self._checkProfit()
+            if self.setStopStatus is True:
+                self._checkStop()    
+    def _order(self, **kwargs):
+        self._checkPosition()
+        params = None
+        order_type = None
+        if kwargs['order_type'] == 'OPEN_LONG':
+            if self.position is not None:
+               return
+            self._setPrice(**kwargs)
+            order_type = 'OPEN_LONG'
+            params = dict( 
                 symbol=self.symbol, 
                 quantity=self.quantity, 
                 side=Client.SIDE_BUY,
-                type=trade_type,
-                timeInForce=Client.TIME_IN_FORCE_GTC,                
-                price = buy_price)
-
-         if trade_type == 'MARKET':
-            params = dict(
+                type='MARKET',
+               # timeInForce=Client.TIME_IN_FORCE_GTC,                
+               # price = kwargs['price']
+                )
+        
+        if kwargs['order_type'] == 'OPEN_SHORT':
+            if self.position is not None:
+               return
+            self._setPrice(**kwargs)
+            order_type = 'OPEN_SHORT'
+            params = dict( 
                 symbol=self.symbol, 
-                quantity=self.quantity,  
-                side=Client.SIDE_BUY,
-                type=Client.ORDER_TYPE_MARKET)
-           
+                quantity=self.quantity, 
+                side=Client.SIDE_SELL,
+                type='MARKET',
+                #timeInForce=Client.TIME_IN_FORCE_GTC,                
+               # price = kwargs['open_short']
+                )
+        if kwargs['order_type'] == 'CLOSE_LONG':
+            if self.position != 1:
+                   return
+            order_type ='CLOSE_LONG'
+            params = dict(  symbol=self.symbol, 
+                            quantity=self.quantity, 
+                            side=Client.SIDE_SELL,
+                            type='MARKET'
+                            #reduceOnly=True
+                            #timeInForce=Client.TIME_IN_FORCE_GTC                            
+                            #price = kwargs['close_price']
+                            )
+        if kwargs['order_type'] == 'CLOSE_SHORT':
+            if self.position != 0:
+                   return
+            order_type ='CLOSE_SHORT'
+            params = dict(  symbol=self.symbol, 
+                            quantity=self.quantity, 
+                            side=Client.SIDE_BUY,
+                            type='MARKET'
+                            #reduceOnly=True
+                            #timeInForce=Client.TIME_IN_FORCE_GTC                            
+                            #price = kwargs['close_price']
+                            )
+        if params is not None:
+            self._placeOrder( order_type,params)
+       
 
-
-         ## place order
-         
-         try:
+    def _placeOrder(self,order_type,params):
+        
+        try:
             order = self.client.futures_create_order(**params)
-            if side == 'OPEN':    
+            if order_type == 'OPEN_LONG' or order_type == 'OPEN_SHORT':   
+
                 self.orderStatus = order['status']
                 self.orderId = order['orderId']
                 self.order = order
-                self.position = 1    
-                if order['status'] == 'FILLED':
+                self.position = 1 if order_type == 'OPEN_LONG' else 0    
+                if True:#order['status'] == 'FILLED':
                                             
                             self._setStop()
                             self._takeProfit() 
                 else :
                     self._checkOrder()         
             else:
-                if order['status'] == 'FILLED':                    
+                if True: #order['status'] == 'FILLED':                    
                     self._clearTrade()
                 else:
                     self._checkOrder()
 
-            self.Logs._writeLog('order success   '+ str(order))    
-         except BinanceAPIException as e:
-            self.Logs._writeLog('order error  '+ str(e))
-         else:
-             self.Logs._writeLog('order success   cofirm  '+ str(order))
-         
-         ## chek ortder status and set order
-            
-         
-         
-         
-          
-            
-
-
-    def _sell(self, sell_price=0, side='OPEN',  trade_type='MARKET',force_trade = False,force_trade_count=3):
-
-        ## check position
-
-        
-        self._checkPosition()
-        if self.position ==0:
-                return
-        if self.position ==1:
-            side = 'CLOSE'   
-        if self.position == None:
-                if side== 'TWO_WAY':
-                   side = 'OPEN'         
-        if side =='CLOSE':
-            if self.position !=1:
-                return         
-        ## set orde constants        
-        self.sellPrice =sell_price        
-        self.forceTrade = force_trade
-        self.forceTradeCount = force_trade_count
-        if side =='OPEN':
-           self._setPrice(sell_price, 'SHORT')
-        else:
-           self.takeProfit = True    
-        if trade_type == 'MARKET':
-            params = dict(
-                    symbol=self.symbol, 
-                    quantity=self.quantity, 
-                    side=Client.SIDE_SELL,                    
-                    type=Client.ORDER_TYPE_MARKET)
-        else:
-            params = dict(  symbol=self.symbol, 
-                            quantity=self.quantity, 
-                            side=Client.SIDE_SELL,
-                            type=trade_type,
-                            timeInForce=Client.TIME_IN_FORCE_GTC,                            
-                            price = sell_price)
-      
-
-        try:
-            order = self.client.futures_create_order(**params)
-            
-
-            if side =='OPEN':  
-                self.orderStatus = order['status']
-                self.orderId = order['orderId']
-                self.order = order
-                self.position =0   
-                if order['status'] == 'FILLED':
-                                      
-                        self._setStop() 
-                        self._takeProfit()
-                else :
-                  self._checkOrder()         
-            else:
-                if order['status'] == 'FILLED':
-                    
-                    self._clearTrade()
-                else:
-                    self._checkOrder()
             self.Logs._writeLog('order success   '+ str(order))    
         except BinanceAPIException as e:
             self.Logs._writeLog('order error  '+ str(e))
-        else:
-             self.Logs._writeLog('order success   cofirm'+ str(order))
+         
+      
+   
+    def _setPrice(self, **kwargs):
+       
+        self._checkBalance()
+        self.leverage = kwargs['leverage']
+        self._setLeverage()
+
+        self.quantity = round((self.tradeMargin/kwargs['price'])*self.leverage)    
+        self.tradePrice = kwargs['price']
+        self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
+        ## set stop   
 
         
-        
+
+        self.profiQuantity = self.quantity//2
+        self.stopPrice = kwargs['stop_price']
+        self.profitPrice = kwargs['profit_price']
+        self.triggerSide = 'SELL' if kwargs['trade_type']== 'LONG' else  'BUY'
                 
     def _setStop(self):
-        if  self.setStopStatus:
+        if  self.setStopStatus is True:
             return
-        if self.position ==None:
+        if self.position is None:
             return     
         if  True: # self.orderStatus == 'FILLED':
             
             order = self.client.futures_create_order( 
-                       symbol=self.symbol, 
-                         quantity=self.quantity, 
-                        side= self.stopSide,
+                        symbol=self.symbol, 
+                        quantity=self.quantity, 
+                        side= self.triggerSide,
                         type='STOP',
-                        price = self.stopLimit,           
-                        stopPrice = self.stopLimit,
-                        timeInForce=Client.TIME_IN_FORCE_GTC
-                        )
+                        
+                        price = self.stopPrice,           
+                        stopPrice = self.stopPrice
+                        #timeInForce=Client.TIME_IN_FORCE_GTC
+                       )
+            
             if order['orderId']:
                 self.stopOrderId = order['orderId']
                 self.setStopStatus = True
                 self.stopOrder  = order      
 
     def _takeProfit(self):
-        p = self.quantity//2
+       
         
-        if  self.takeProfitStatus:
+        if  self.takeProfitStatus is True:
             return
-        if self.position ==None:
+        if self.position is None:
             return     
         if  True: # self.orderStatus == 'FILLED':
             
             order = self.client.futures_create_order( 
                         symbol=self.symbol, 
-                        quantity=p, 
-                        side= self.profitSide,
+                        quantity=self.profiQuantity, 
+                        side= self.triggerSide,
                         type='TAKE_PROFIT',
-                        price = self.profitLimit,           
-                        stopPrice = self.profitLimit,
-                        timeInForce=Client.TIME_IN_FORCE_GTC
+                        price = self.profitPrice,          
+                        stopPrice = self.profitPrice
+                        #timeInForce=Client.TIME_IN_FORCE_GTC
                         )
+            
             if order['orderId']:
                 self.profitOrderId = order['orderId']
                 self.takeProfitStatus = True
@@ -325,7 +240,7 @@ class Trade:
         self.buyPrice =0
         self.sellPrice =0
         self.tradePrice =0
-        self.stopSide = None
+        self.triggerSide = None
         self.takeProfit = False
         self.orderStatus = 'NEW'
         self.profitSide = None
@@ -334,33 +249,45 @@ class Trade:
         self.profitOrderId = None
         self.profitOrder = None
         self.profitLimit = 0
-
-
+        self.profitPrice = None
+        self.stopPrice = None
        # self._cancelOrder(self.stopOrder)
        
 
     def _setLeverage(self):
         self.client.futures_change_leverage(symbol=self.symbol, leverage=self.leverage)
-        # self._checkPosition()
-        # if self.position ==0:
-        #     self.client.futures_change_leverage(symbol=self.symbol, leverage=self.leverage)
-        #     self.leverage = l
 
-
-                
+    #''' check current usdt balance '''
+    def _checkBalance(self):
         
-    
+        balance = self.client.futures_account_balance()
+        usdt_balance = [d for d in balance if d['asset'] == 'USDT']
+        balanceUsdt=usdt_balance[0]['withdrawAvailable']
+        self.balance =float(balanceUsdt)
+        self.tradeMargin =self.marginRate*(float(balanceUsdt)/100)
+
+
     def _cancelOrder(self, order):
+        
         p = self.client.futures_cancel_order(symbol=self.symbol, orderId = order['orderId'])
         if p['status'] == 'CANCELED':
             
-            if order['side'] == 'BUY':
-                if self.setStopStatus:
+            if order['type'] == 'MARKET':
+                if self.setStopStatus is True:
                      self._cancelOrder(self.stopOrder)
+                if self.takeProfitStatus is True:
+                     self._cancelOrder(self.profitOrder)
                 self._clearTrade()
-            if order['side'] == 'STOP':
+            if order['type'] == 'STOP':
                 self.stopOrderId = 0
                 self.setStopStatus = False 
+                self.stopOrder  = None
+            if order['type'] == 'TAKE_PROFİT':
+                self.profitOrderId = 0
+                self.takeProfitStatus = False 
+                self.profitOrder  = None
+
+   # ''' check position of current coin '''
     def _checkPosition(self):
         p = self.client.futures_position_information(symbol=self.symbol)
         
@@ -372,32 +299,37 @@ class Trade:
             self.quantity = np.abs(float(p[0]['positionAmt']))     
         else:
             self.position = None    
-            self._clearTrade() 
+            
 
 
     def _cancelOrders(self):
         self.client.futures_cancel_all_open_orders(symbol = self.symbol)
+        
        
     def _checkProfit(self):
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.profitOrderId)
 
         if order['status'] == 'FILLED':
-           p = self.quantity//2
-           self.quantity = self.quantity-p
+           
+           self.quantity = self.quantity-self.profiQuantity
+           
+           self._cancelOrder(self.stopOrder)
+           self._setStop()
+    def _checkStop(self):
+        order = self.client.futures_get_order(symbol=self.symbol,orderId=self.stopOrderId)
+
+        if order['status'] == 'FILLED':
+           
+           self._clearTrade()
 
     def _checkOrder(self):
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.orderId)
        
         self.orderStatus = order['status']
-       # if order['status'] == 'FILLED':
-        if self.takeProfit == True:
-               
-                self._clearTrade()
-        else: 
-                if self.order['side'] == 'BUY':
-                    self.position =1
+        if self.order['side'] == 'BUY':
+            self.position =1
                     
-                else:
-                    self.position =0
-                self._setStop() 
-                self._takeProfit()   
+        else:
+            self.position =0
+        self._setStop() 
+        self._takeProfit()   
