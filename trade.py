@@ -11,6 +11,7 @@ from logger import Logs
 class Trade:
     def __init__(self,client, coin):
         ## objects
+        self.Logs = Logs()
         self.client = client
         self.symbol = coin
     
@@ -22,7 +23,8 @@ class Trade:
         self.side = None
         self.leverage=5
 
-         
+        self.position = None 
+        
         ## take profi order 
         self.profitSide = None
         self.takeProfit = False
@@ -34,14 +36,14 @@ class Trade:
 
         ## stop order
         self.stopSide = None
-        self.stopLimit = 0
+        self.stopLimit = None
         self.stopOrderId = None
         self.stopOrder = None
         self.setStopStatus = False
         self.stopPrice = None
         
         ## trade order
-        self.position = None 
+        
         self.order = None
         self.balance = 0
         self.tradeMargin =0
@@ -171,30 +173,40 @@ class Trade:
         ## set stop   
 
         
-
+        self.stopLimit = kwargs['stop_limit']
         self.profiQuantity = self.quantity//2
         self.stopPrice = kwargs['stop_price']
         self.profitPrice = kwargs['profit_price']
         self.triggerSide = 'SELL' if kwargs['trade_type']== 'LONG' else  'BUY'
                 
-    def _setStop(self):
+    def _setStop(self, typ='STOP'):
         if  self.setStopStatus is True:
             return
         if self.position is None:
             return     
         if  True: # self.orderStatus == 'FILLED':
-            
-            order = self.client.futures_create_order( 
-                        symbol=self.symbol, 
-                        quantity=self.quantity, 
-                        side= self.triggerSide,
-                        type='STOP',
-                        
-                        price = self.stopPrice,           
-                        stopPrice = self.stopPrice
-                        #timeInForce=Client.TIME_IN_FORCE_GTC
-                       )
-            
+            if typ =='STOP':
+                order = self.client.futures_create_order( 
+                            symbol=self.symbol, 
+                            quantity=self.quantity, 
+                            side= self.triggerSide,
+                            type='STOP',
+                            
+                            price = self.stopPrice,           
+                            stopPrice = self.stopPrice
+                            #timeInForce=Client.TIME_IN_FORCE_GTC
+                        )
+            if typ=='TRAILING_STOP_MARKET':
+                order = self.client.futures_create_order( 
+                            symbol=self.symbol, 
+                            quantity=self.quantity, 
+                            side= self.triggerSide,
+                            type='TRAILING_STOP_MARKET',
+                            callbackRate=self.stopLimit
+                            #price = self.stopPrice,           
+                            #stopPrice = self.stopPrice
+                            #timeInForce=Client.TIME_IN_FORCE_GTC
+                        )
             if order['orderId']:
                 self.stopOrderId = order['orderId']
                 self.setStopStatus = True
@@ -314,7 +326,7 @@ class Trade:
            self.quantity = self.quantity-self.profiQuantity
            
            self._cancelOrder(self.stopOrder)
-           self._setStop()
+           self._setStop('TRAILING_STOP_MARKET')
     def _checkStop(self):
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.stopOrderId)
 

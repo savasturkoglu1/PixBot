@@ -68,7 +68,7 @@ class Data:
         
         if row["t"] != self.time:
             
-             
+             print(row["t"])
              self.df_15m = self._dataConvert(900000, self.df_15m)             
              self.df_30m = self._dataConvert(900000*2, self.df_30m)  
              self.df_1h = self._dataConvert(900000*4, self.df_1h)  

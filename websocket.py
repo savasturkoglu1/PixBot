@@ -39,7 +39,7 @@ class Socket:
         self._lookBack() 
         
         '''  start socket '''
-        self.connection_key =self.bm.start_kline_socket(self.coin,  self._process, interval=Client.KLINE_INTERVAL_5MINUTE) 
+        self.connection_key =self.bm.start_kline_socket(self.coin,  self._process, interval=Client.KLINE_INTERVAL_1MINUTE) 
         self.bm.start()
 
 

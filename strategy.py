@@ -6,15 +6,18 @@ import pandas as pd
 import numpy as np
 from signal import Signal
 from trade import Trade
-
+from logger import Logs
 class Strategy:
 
     def __init__(self, client,coin):
         
         ## market
+        
         self.coin = coin
         self.client = client
         
+
+
 
         ## defaults
         self.atr_tresh = {
@@ -29,9 +32,10 @@ class Strategy:
         self.Indicator = Indicator()
         self.Signal = Strategy()
         self.Trade = Trade(self.client, self.coin)
+        self.Logs = Logs()
 
         ### sources
-        self.rafined = pd.read_csv(base_path+'/source/rafined.csv')
+        self.rafined = pd.read_csv(base_path+'/source/rafined_'+self.coin+'.csv')
         self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
         
 
@@ -69,13 +73,19 @@ class Strategy:
             self.df = self.df_1h
         else:
             self.df = self.df_15m 
-
-        self.position = self.Trade.position
         
-           
-
+        self.Trade._live(live)    
+       
+        self.position = self.Trade.position
+        self.Signal.position = self.position
+                
         self.signals =  self.Signal._getSignal(self.df, **self.params)
         
+        params = None
+        params = dict(
+
+        )
+        self.Trade._order(**params)
        
     
 
