@@ -23,7 +23,7 @@ class GetData:
         self.look_back_short = look_back_short
 
         ## periods
-        self.periods = ['_5m','_15m','_30m','_1h']
+        self.periods = ['_1m','_5m','_15m','_30m','_1h']
         self.intervals = {
                     '_1m' : Client.KLINE_INTERVAL_1MINUTE,
                     '_5m' : Client.KLINE_INTERVAL_5MINUTE,
@@ -45,6 +45,7 @@ class GetData:
         d = timedelta(days = look_back)
         k=day-d
         k.strftime('%d %B, %Y')
+        return  k.strftime('%d %B, %Y')
         
 
     
@@ -54,9 +55,10 @@ class GetData:
   
         for period in self.periods:
             back= self.from_date_back
-            if period in self.periods[:1]:
+            if period in self.periods[:2]:
                 back = self.from_date_back_short
             path = self.file_path+self.coin+period+'.csv'
+            print(self.coin, self.intervals[period], back)
             data_ = self.client.get_historical_klines(self.coin, self.intervals[period], back)  
             df = pd.DataFrame(data_)
             

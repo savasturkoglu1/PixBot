@@ -1,4 +1,3 @@
-from operator import iconcat
 from websocket import Socket
 from client import iClient
 
@@ -7,7 +6,7 @@ class Bot:
 
     def __init__(self):
         self.wsockets = {}
-        self.client = iClient().client
+        self.client = iClient()
         self.coins = ['BTCUSDT','ETHUSDT'] #'ADAUSDT', 'DOTUSDT','XRPUSDT',,'ADAUSDT', 'DOTUSDT'
     
     def _runBot(self, market='all'):

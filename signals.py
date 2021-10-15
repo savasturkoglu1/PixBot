@@ -1,7 +1,7 @@
 import pandas as pd 
 from indicator import Indicator
 import numpy as np 
-class Signal:
+class Signals:
     def __init__(self):
        
         self.Indicator = Indicator()

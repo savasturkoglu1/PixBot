@@ -4,7 +4,7 @@ from indicator import  Indicator
 from env import base_path
 import pandas as pd
 import numpy as np
-from signal import Signal
+from signals import Signals
 from trade import Trade
 from logger import Logs
 class Strategy:
@@ -30,12 +30,12 @@ class Strategy:
 
         ## objects
         self.Indicator = Indicator()
-        self.Signal = Strategy()
+        self.Signal = Signals()
         self.Trade = Trade(self.client, self.coin)
         self.Logs = Logs()
 
         ### sources
-        self.rafined = pd.read_csv(base_path+'/source/rafined_'+self.coin+'.csv')
+        self.rafined = pd.read_csv(base_path+'/source/rafine_'+self.coin+'.csv')
         self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
         
 
@@ -54,7 +54,7 @@ class Strategy:
         self.params = None
         self.position = None
 
-    def _process(self, live , df_15m, df_30m, df_1h):
+    def _process(self, live , df_5m, df_15m, df_30m, df_1h):
 
         ## set data frames
       
@@ -74,18 +74,18 @@ class Strategy:
         else:
             self.df = self.df_15m 
         
-        self.Trade._live(live)    
+       # self.Trade._live(live)    
        
         self.position = self.Trade.position
         self.Signal.position = self.position
                 
         self.signals =  self.Signal._getSignal(self.df, **self.params)
-        
+        print(self.params, self.signals)
         params = None
         params = dict(
 
         )
-        self.Trade._order(**params)
+       # self.Trade._order(**params)
        
     
 

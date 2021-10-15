@@ -1,6 +1,6 @@
 
 ### binace websocker 
-from binance.websockets import BinanceSocketManager
+from binance import ThreadedWebsocketManager
 
 from binance.client import Client
 
@@ -19,10 +19,10 @@ class Socket:
         
         self.coin = coin
         self.Client = client
-        self.Data = Data(self.Client, self.coin)
-        self.GetData = GetData(self.Client, self.coin)
+        self.Data = Data(self.Client.client, self.coin)
+        self.GetData = GetData(self.Client.client, self.coin)
 
-        self.bm = BinanceSocketManager(self.Client)
+        self.bm = ThreadedWebsocketManager(api_key=self.Client.api_key, api_secret=self.Client.api_secret)
         self.connection_key = None
         
 
@@ -31,16 +31,18 @@ class Socket:
         if msg['e'] == 'error':
             self._stopSocket(self.coin)
             self._startSocket()
-        print(msg)
-       # self.Data._dataProcess(msg)
+        
+        self.Data._dataProcess(msg)
 
     def _startSocket(self):
         
+       
         self._lookBack() 
         
-        '''  start socket '''
-        self.connection_key =self.bm.start_kline_socket(self.coin,  self._process, interval=Client.KLINE_INTERVAL_1MINUTE) 
         self.bm.start()
+        '''  start socket '''
+        self.connection_key =self.bm.start_kline_socket( callback= self._process,symbol=self.coin, interval=Client.KLINE_INTERVAL_1MINUTE) #)
+       # self.bm.start()
 
 
     def _stopSocket(self):
@@ -56,7 +58,7 @@ class Socket:
 
         '''  get 10 days data  '''
 
-        self.GetData._getData()
+        #self.GetData._getData()
 
 
 
