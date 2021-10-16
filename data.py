@@ -61,32 +61,13 @@ class Data:
      
 
         '''  clear duplicates '''
-        self.df_15m = self.df_15m.drop_duplicates(subset=['Time'], keep='last')
-        self.df_30m = self.df_30m.drop_duplicates(subset=['Time'], keep='last')
-        self.df_1h = self.df_1h.drop_duplicates(subset=['Time'], keep='last')
-        self.df_5m = self.df_5m.drop_duplicates(subset=['Time'], keep='last')
+        # self.df_15m = self.df_15m.drop_duplicates(subset=['Time'], keep='last')
+        # self.df_30m = self.df_30m.drop_duplicates(subset=['Time'], keep='last')
+        # self.df_1h = self.df_1h.drop_duplicates(subset=['Time'], keep='last')
+        # self.df_5m = self.df_5m.drop_duplicates(subset=['Time'], keep='last')
 
 
         
-       
-        
-        if event_time >=row["T"]:  #!= self.time:
-            
-             print(row["t"], event_time)
-             self.df_5m = self._dataConvert(300000, self.df_5m)
-             self.df_15m = self._dataConvert(900000, self.df_15m)             
-             self.df_30m = self._dataConvert(900000*2, self.df_30m)  
-             self.df_1h = self._dataConvert(900000*4, self.df_1h)  
-               
-             
-             self.Strategy._process( row, self.df_5m, self.df_15m,self.df_30m, self.df_1h ) 
-             
-             self.time = row['t']
-             time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
-             
-             print( 'time ', time )
-
-
         w = {
                 "Time" :int(row['t']),
                 "Open" :float(row["o"]),
@@ -101,6 +82,25 @@ class Data:
         index_names = self.df_1m[ self.df_1m['Time'] == int(row['t']) ].index
         self.df_1m.drop(index_names, inplace = True)
         self.df_1m = self.df_1m.append(w, ignore_index=True )
+        
+        if event_time >=row["T"]:  #!= self.time:
+            
+             
+             self.df_5m = self._dataConvert(300000, self.df_5m)
+             self.df_15m = self._dataConvert(900000, self.df_15m)             
+             self.df_30m = self._dataConvert(900000*2, self.df_30m)  
+             self.df_1h = self._dataConvert(900000*4, self.df_1h)  
+               
+             
+             self.Strategy._process( row, self.df_5m, self.df_15m,self.df_30m, self.df_1h ) 
+             
+             self.time = row['t']
+             time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
+            # self._writeData()
+             print( 'time ', time )
+
+
+        
         
         
     def _dataConvert(self, ms, df):
@@ -122,3 +122,13 @@ class Data:
            
             df.loc[df.index[-1],['Close','High','Low']] = [Close, High, Low]
         return df
+    
+    def _writeData(self):
+            
+     
+
+
+         self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')
+         self.df_30m.to_csv(base_path+'/data/obs/'+self.coin+'df_30m.csv')
+         self.df_5m.to_csv(base_path+'/data/obs/'+self.coin+'df_5m.csv')
+        

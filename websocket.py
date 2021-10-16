@@ -27,9 +27,10 @@ class Socket:
         
 
     def _process(self, msg):
-       
+        
+        print(msg)
         if msg['e'] == 'error':
-            self._stopSocket(self.coin)
+            self._stopSocket()
             self._startSocket()
         
         self.Data._dataProcess(msg)
@@ -58,7 +59,7 @@ class Socket:
 
         '''  get 10 days data  '''
 
-        #self.GetData._getData()
+        self.GetData._getData()
 
 
 

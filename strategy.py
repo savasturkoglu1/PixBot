@@ -43,6 +43,7 @@ class Strategy:
         self.df_15m = None
         self.df_30m = None
         self.df_1h = None
+        self.df_5m = None
         self.live = None        
         self.market_ind = None
 
@@ -53,11 +54,13 @@ class Strategy:
         self.signals = None
         self.params = None
         self.position = None
+        self.intval =60000
 
     def _process(self, live , df_5m, df_15m, df_30m, df_1h):
 
         ## set data frames
-      
+        
+        self.df_5m = df_5m
         self.df_15m = df_15m
         self.df_30m = df_30m
         self.df_1h = df_1h
@@ -69,28 +72,54 @@ class Strategy:
 
         if self.params['time_frame'] == '30m':
             self.df = self.df_30m
+            self.intval = self.intval*30
         elif self.params['time_frame'] == '1h':
             self.df = self.df_1h
+            self.intval = self.intval*60
+        elif self.params['time_frame'] == '5m':
+            self.df = self.df_5m
+            self.intval = self.intval*50
         else:
             self.df = self.df_15m 
+            self.intval = self.intval*15
         
-       # self.Trade._live(live)    
+        self.Trade._live(live)    
        
         self.position = self.Trade.position
-        self.Signal.position = self.position
+        if self.position is None:
+           self.Signal.long_flag = False
+           self.Signal.short_flag = False
                 
-        self.signals =  self.Signal._getSignal(self.df, **self.params)
-        print(self.params, self.signals)
-        params = None
-        params = dict(
+        self.signals =  self.Signal._getSignal(self.df, self.params)
+        
 
-        )
-       # self.Trade._order(**params)
+        ## set trade params 
+        params=None
+        if self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
+            params=dict(
+                order_type=self.signals['position'],
+                trade_type='LONG' if self.signals['position'] == 'OPEN_LONG' else 'SHORT',
+                price=self.signals['open_long'] if self.signals['position'] == 'OPEN_LONG' else self.signals['open_short'],
+                stop_price =self.signals['stop_price'],
+                stop_limit =self.signals['stop_limit'],
+                profit_price=self.signals['profit_price'], 
+                leverage=self.signals['leverage']
+            )
+        if self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT':
+            params=dict(
+                order_type=self.signals['position'],
+                trade_type='LONG' if self.signals['position'] == 'CLOSE_LONG' else 'SHORT',
+                price=self.signals['close_long'] if self.signals['position'] == 'CLOSE_LONG' else self.signals['close_short'],
+                
+            )
+        if self.signals['Time']%self.intval ==0  and params is not None:
+           self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.params))   
+           self.Trade._order(**params)
        
     
 
     def _getStrategy(self):
-        r = self.rafined[(self.rafined.coin==self.coin)&(self.rafined.market==self.market)]
+        r = self.rafined[self.rafined.market==self.market]
         if r.shape[0]<1:
             self.params = None
         row = r.loc[r['trade_index'].idxmax()].to_dict()

@@ -56,13 +56,13 @@ class Signals:
         
 
   
-    def _signal(self,ind , mark,**kwargs):
+    def _signal(self,ind , **kwargs):
         data = ind.iloc[-1].to_dict()
         self.row ={
-        'positon':np.nan,
+        'Time':data['Time'],'positon':np.nan,
         'open_long':np.nan,'close_long':np.nan,'open_short':np.nan,
         'close_short':np.nan,'stop_price':np.nan,'trailing_stop':np.nan,
-                'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan} #'Time':data['Time'],'Close':data['Close'],'High':data['High'],'Low':data['Low'],'Open':data['Open'],
+         'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan} #'Time':data['Time'],'Close':data['Close'],'High':data['High'],'Low':data['Low'],'Open':data['Open'],
         
         close = data['Close']
         ## trend
@@ -92,7 +92,10 @@ class Signals:
                  
         else:
             self.trend = 2
-        
+        if data['trend_long']>close:
+                        self.trend=0
+        if  close> data['trend_long']:
+                        self.trend = 1
         if data['adx_trend'] >30:
                self.trend = 2
 
@@ -211,7 +214,7 @@ class Signals:
 
         if  self.trend in [1,2]  and self.main_signal==1  and self.long_flag is False and self.short_flag is False :
            # if self._priceFilter(data, **kwargs) is True:
-               # self.long_flag = True                
+                self.long_flag = True                
                 self.row['open_long'] = close
                 self.row['position'] = 'OPEN_LONG'
                 self._tradeStrategy(data,**kwargs)
@@ -220,20 +223,20 @@ class Signals:
 
         if self.trend in [0,2] and self.main_signal ==0 and   self.short_flag is False and self.long_flag is False:
            # if self._priceFilter(data, **kwargs) is True:
-              #  self.short_flag = True
+                self.short_flag = True
                 self.row['open_short'] = close
                 self.row['position'] = 'OPEN_SHORT'
                 self._tradeStrategy(data,**kwargs)
                 #print(mark,'time:',datetime.utcfromtimestamp(int(data['Time']//1000)).strftime("%Y-%m-%d %H:%M"), {k: v for k, v in kwargs.items() if v==v}, 'short')
             
         if self.main_signal == 0  and self.long_flag is True:
-           # self.long_flag = False 
+            self.long_flag = False 
             self.row['close_long'] =  close 
             self.row['position'] = 'CLOSE_LONG' 
  
         if self.main_signal == 1  and self.short_flag is True:
             
-         #   self.short_flag = False
+            self.short_flag = False
             self.row['close_short'] =  close
             self.row['position'] = 'CLOSE_SHORT' 
         
@@ -244,13 +247,13 @@ class Signals:
         return self.row
     def _tradeStrategy(self,data,**kwargs):
        
-        if kwargs['stop_indicator'] == 'bb':
-            if self.long_flag is True:
-                self.stop_price = data['bb_lower']
-            if self.short_flag is True:
-                self.stop_price = data['bb_upper']    
+        # if kwargs['stop_indicator'] == 'bb':
+        #     if self.long_flag is True:
+        #         self.stop_price = data['bb_lower']
+        #     if self.short_flag is True:
+        #         self.stop_price = data['bb_upper']    
 
-        if kwargs['stop_indicator'] == 'atr':
+        if True: #kwargs['stop_indicator'] == 'atr':
             if self.long_flag is True:
                 self.stop_price = data['Close']-2*data['atr']
             if self.short_flag is True:
