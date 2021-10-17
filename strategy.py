@@ -43,7 +43,7 @@ class Strategy:
         self.Logs = Logs()
 
         ### sources
-        self.rafined = pd.read_csv(base_path+'/source/rafine_'+self.coin+'.csv')
+        self.rafined = pd.read_csv(base_path+'/source/rafine_bi_'+self.coin+'.csv')
         self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
         
 

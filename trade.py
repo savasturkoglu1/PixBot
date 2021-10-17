@@ -16,7 +16,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.45
+        self.marginRate = 0.30
         self.stopRate = 2
         self.profitRate = 7
         
@@ -63,7 +63,7 @@ class Trade:
         
 
     def _live(self, data):
-        print(self.symbol, self.position, self.quantity)
+       # print(self.symbol, self.position, self.quantity)
         if self.order is not  None:
             if self.orderStatus !='FILLED':
                 self._checkOrder()
@@ -315,7 +315,9 @@ class Trade:
             self.position =1 
             self.quantity = np.abs(float(p[0]['positionAmt']))     
         else:
-            self.position = None    
+            self.position = None
+            self._clearTrade()
+ 
             
 
 
