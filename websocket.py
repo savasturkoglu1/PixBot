@@ -28,7 +28,7 @@ class Socket:
 
     def _process(self, msg):
         
-        print(msg)
+        
         if msg['e'] == 'error':
             self._stopSocket()
             self._startSocket()

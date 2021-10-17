@@ -28,6 +28,14 @@ class Strategy:
             'XRPUSDT':1.2
         }
 
+        self.prc = {
+            'BTCUSDT':0,
+            'ETHUSDT':0,
+            'DOTUSDT':2,
+            'ADAUSDT':3,
+            'XRPUSDT':3
+        }
+
         ## objects
         self.Indicator = Indicator()
         self.Signal = Signals()
@@ -56,6 +64,10 @@ class Strategy:
         self.position = None
         self.intval =60000
 
+        self.trade_signal = None
+        self.trade_count = None
+        self.trade_perm = False
+
     def _process(self, live , df_5m, df_15m, df_30m, df_1h):
 
         ## set data frames
@@ -78,7 +90,7 @@ class Strategy:
             self.intval = self.intval*60
         elif self.params['time_frame'] == '5m':
             self.df = self.df_5m
-            self.intval = self.intval*50
+            self.intval = self.intval*5
         else:
             self.df = self.df_15m 
             self.intval = self.intval*15
@@ -92,7 +104,22 @@ class Strategy:
                 
         self.signals =  self.Signal._getSignal(self.df, self.params)
         
-
+        
+        
+        if self.signals['position'] == self.signals['position']:
+            if self.trade_signal is None:
+                self.trade_signal = self.signals['position']
+                self.trade_count = 3
+                return
+            else:
+                self.trade_count = max(self.trade_count-1,0)
+        if self.trade_count ==0:
+            if self.trade_signal == 'OPEN_LONG' or self.trade_signal == 'CLOSE_SHORT':
+                if self.df.iloc[-2].Close<self.df.iloc[-1].Close:
+                  self.trade_perm = True
+            if self.trade_signal == 'OPEN_SHORT' or self.trade_signal == 'CLOSE_LONG':
+                if self.df.iloc[-2].Close>self.df.iloc[-1].Close:
+                  self.trade_perm = True
         ## set trade params 
         params=None
         if self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
@@ -100,9 +127,9 @@ class Strategy:
                 order_type=self.signals['position'],
                 trade_type='LONG' if self.signals['position'] == 'OPEN_LONG' else 'SHORT',
                 price=self.signals['open_long'] if self.signals['position'] == 'OPEN_LONG' else self.signals['open_short'],
-                stop_price =self.signals['stop_price'],
+                stop_price =round(self.signals['stop_price'], self.prc[self.coin]),
                 stop_limit =self.signals['stop_limit'],
-                profit_price=self.signals['profit_price'], 
+                profit_price=round(self.signals['take_profit'], self.prc[self.coin]) if self.signals['take_profit'] is not None else None,
                 leverage=self.signals['leverage']
             )
         if self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT':
@@ -112,9 +139,14 @@ class Strategy:
                 price=self.signals['close_long'] if self.signals['position'] == 'CLOSE_LONG' else self.signals['close_short'],
                 
             )
-        if self.signals['Time']%self.intval ==0  and params is not None:
+        if  params is not None and self.trade_perm is True : #and self.signals['Time']%self.intval ==0
            self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.params))   
            self.Trade._order(**params)
+           self.trade_perm = False
+           self.trade_count = None
+           self.trade_signal = None
+           
+
        
     
 
@@ -122,7 +154,7 @@ class Strategy:
         r = self.rafined[self.rafined.market==self.market]
         if r.shape[0]<1:
             self.params = None
-        row = r.loc[r['trade_index'].idxmax()].to_dict()
+        row = r.loc[r['balance_i'].idxmax()].to_dict()
         #.tail(1).to_dict('records')[0]
         self.stg = row['strategy']
          

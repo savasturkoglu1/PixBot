@@ -16,7 +16,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 90
+        self.marginRate = 0.45
         self.stopRate = 2
         self.profitRate = 7
         
@@ -63,6 +63,7 @@ class Trade:
         
 
     def _live(self, data):
+        print(self.symbol, self.position, self.quantity)
         if self.order is not  None:
             if self.orderStatus !='FILLED':
                 self._checkOrder()
@@ -164,17 +165,18 @@ class Trade:
     def _setPrice(self, **kwargs):
        
         self._checkBalance()
-        self.leverage = kwargs['leverage']
+        self.leverage = int(kwargs['leverage'])
         self._setLeverage()
 
-        self.quantity = round((self.tradeMargin/kwargs['price'])*self.leverage)    
+        self.quantity = round((self.tradeMargin/kwargs['price'])*self.leverage,3)   
+        self.profiQuantity = self.quantity/2 
         self.tradePrice = kwargs['price']
         self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
         ## set stop   
 
         
         self.stopLimit = kwargs['stop_limit']
-        self.profiQuantity = self.quantity//2
+        
         self.stopPrice = kwargs['stop_price']
         self.profitPrice = kwargs['profit_price']
         self.triggerSide = 'SELL' if kwargs['trade_type']== 'LONG' else  'BUY'
@@ -274,9 +276,12 @@ class Trade:
         
         balance = self.client.futures_account_balance()
         usdt_balance = [d for d in balance if d['asset'] == 'USDT']
-        balanceUsdt=usdt_balance[0]['withdrawAvailable']
-        self.balance =float(balanceUsdt)
-        self.tradeMargin =self.marginRate*(float(balanceUsdt)/100)
+        wdth_balance=usdt_balance[0]['withdrawAvailable']
+        total_balance =usdt_balance[0]['balance'] 
+        margin = self.marginRate*float(total_balance)
+        margin = margin if margin <float(wdth_balance) else float(wdth_balance)*0.9
+        self.balance =float(total_balance)
+        self.tradeMargin =margin
 
 
     def _cancelOrder(self, order):

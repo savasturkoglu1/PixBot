@@ -59,10 +59,11 @@ class Signals:
     def _signal(self,ind , **kwargs):
         data = ind.iloc[-1].to_dict()
         self.row ={
-        'Time':data['Time'],'positon':np.nan,
+        'Time':data['Time'],'position':np.nan,
         'open_long':np.nan,'close_long':np.nan,'open_short':np.nan,
         'close_short':np.nan,'stop_price':np.nan,'trailing_stop':np.nan,
-         'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan} #'Time':data['Time'],'Close':data['Close'],'High':data['High'],'Low':data['Low'],'Open':data['Open'],
+         'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan}
+          #'Time':data['Time'],'Close':data['Close'],'High':data['High'],'Low':data['Low'],'Open':data['Open'],
         
         close = data['Close']
         ## trend
@@ -92,10 +93,10 @@ class Signals:
                  
         else:
             self.trend = 2
-        if data['trend_long']>close:
-                        self.trend=0
-        if  close> data['trend_long']:
-                        self.trend = 1
+        # if data['trend_long']>close:
+        #                 self.trend=0
+        # if  close> data['trend_long']:
+        #                 self.trend = 1
         if data['adx_trend'] >30:
                self.trend = 2
 
@@ -279,13 +280,18 @@ class Signals:
             self.trailing_stop = None
         if  True: #kwargs['take_profit']  is 
             if self.long_flag is True:
-                self.take_profit = 1.075*data['Close']
+                self.take_profit = (1+self.stop_limit/100*2.5)*data['Close']
             if self.short_flag is True:
-                self.take_profit = 0.925*data['Close']
+                self.take_profit = (1-self.stop_limit/100*2.5)*data['Close']
         else:
             self.take_profit = None
-        self.row.update({'stop_price':self.stop_price,'trailing_stop':self.trailing_stop,
-                'leverage':self.leverage,'take_profit':self.take_profit, 'stop_limit':self.stop_limit })
+       # self.dec = len(str(data['Close']).split('.')[1])
+        self.row.update({
+            'stop_price':self.stop_price,
+            'trailing_stop':self.trailing_stop,           
+            'leverage':self.leverage,
+            'take_profit':self.take_profit,
+            'stop_limit':self.stop_limit })
                 
     def _priceFilter(self,data, **kwargs):
         signal = True
