@@ -5,6 +5,7 @@ from env import base_path
 import pandas as pd
 import numpy as np
 from signals import Signals
+from priceActionSignal import PriceAction
 from trade import Trade
 from logger import Logs
 class Strategy:
@@ -33,18 +34,19 @@ class Strategy:
             'ETHUSDT':0,
             'DOTUSDT':2,
             'ADAUSDT':3,
-            'XRPUSDT':3
+            'XRPUSDT':4
         }
 
         ## objects
         self.Indicator = Indicator()
         self.Signal = Signals()
+        self.PA = PriceAction()
         self.Trade = Trade(self.client, self.coin)
         self.Logs = Logs()
 
         ### sources
-        self.rafined = pd.read_csv(base_path+'/source/rafine_bi_'+self.coin+'.csv')
-        self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
+        self.rafined = None#pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
+        self.strategies =None#pd.read_csv(base_path+'/source/strategies.csv')
         
 
         ## data framse        
@@ -67,7 +69,10 @@ class Strategy:
         self.trade_signal = None
         self.trade_count = None
         self.trade_perm = False
-
+        self.bot_type = 'PACTION' # 'INDICATOR', 
+        if self.bot_type == 'INDICATOR':
+            self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
+            self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
     def _process(self, live , df_5m, df_15m, df_30m, df_1h):
 
         ## set data frames
@@ -77,8 +82,32 @@ class Strategy:
         self.df_30m = df_30m
         self.df_1h = df_1h
         self.live  = live
-        
 
+        self.Trade._live(live)
+        if self.bot_type=='PACTION':
+               self._priceActionSignals()
+        if self.bot_type=='INDICATOR':
+               self._indicatorSignal()
+        
+    
+    def _priceActionSignals(self):
+        ## check trade position
+        self.Trade._live(self.live)
+        self.position = self.Trade.position
+        if self.position is None:
+           self.PA.long_flag = False
+           self.PA.short_flag = False
+
+        ## get signal
+        self.signals = self.PA._getSignal(self.df_5m)
+
+        ## set order
+        params = self._tradeParams()
+        if params is not None:
+                self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.signals))   
+                self.Trade._order(**params)  
+    def _indicatorSignal(self):
+        self.Trade._live(self.live)
         self._getMarket()
         self._getStrategy()
 
@@ -95,7 +124,7 @@ class Strategy:
             self.df = self.df_15m 
             self.intval = self.intval*15
         
-        self.Trade._live(live)    
+            
        
         self.position = self.Trade.position
         if self.position is None:
@@ -103,24 +132,18 @@ class Strategy:
            self.Signal.short_flag = False
                 
         self.signals =  self.Signal._getSignal(self.df, self.params)
+        params = self._tradeParams()
         
         
         
-        if self.signals['position'] == self.signals['position']:
-            if self.trade_signal is None:
-                self.trade_signal = self.signals['position']
-                self.trade_count = 3
-                return
-            else:
-                self.trade_count = max(self.trade_count-1,0)
-        if self.trade_count ==0:
-            if self.trade_signal == 'OPEN_LONG' or self.trade_signal == 'CLOSE_SHORT':
-                if self.df.iloc[-2].Close<self.df.iloc[-1].Close:
-                  self.trade_perm = True
-            if self.trade_signal == 'OPEN_SHORT' or self.trade_signal == 'CLOSE_LONG':
-                if self.df.iloc[-2].Close>self.df.iloc[-1].Close:
-                  self.trade_perm = True
-        ## set trade params 
+        if  params is not None and self.trade_perm is True : 
+           self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.params))   
+           self.Trade._order(**params)
+           self.trade_perm = False
+           self.trade_count = None
+           self.trade_signal = None
+
+    def _tradeParams(self):
         params=None
         if self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
             params=dict(
@@ -128,7 +151,7 @@ class Strategy:
                 trade_type='LONG' if self.signals['position'] == 'OPEN_LONG' else 'SHORT',
                 price=self.signals['open_long'] if self.signals['position'] == 'OPEN_LONG' else self.signals['open_short'],
                 stop_price =round(self.signals['stop_price'], self.prc[self.coin]),
-                stop_limit =self.signals['stop_limit'],
+                stop_limit =round(self.signals['stop_limit'],3),
                 profit_price=round(self.signals['take_profit'], self.prc[self.coin]) if self.signals['take_profit'] is not None else None,
                 leverage=self.signals['leverage']
             )
@@ -139,15 +162,7 @@ class Strategy:
                 price=self.signals['close_long'] if self.signals['position'] == 'CLOSE_LONG' else self.signals['close_short'],
                 
             )
-        if  params is not None and self.trade_perm is True : #and self.signals['Time']%self.intval ==0
-           self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.params))   
-           self.Trade._order(**params)
-           self.trade_perm = False
-           self.trade_count = None
-           self.trade_signal = None
-           
-
-       
+        return params
     
 
     def _getStrategy(self):

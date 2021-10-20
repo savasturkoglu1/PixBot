@@ -86,10 +86,12 @@ class Signals:
             if  close> data['trend_long']:
                         self.trend = 1
         elif kwargs['trend_type'] == 'ROCEMA144':
-            if  data['roc_ema']>0:                    
+            if  data['roc_ema']>0.1:                    
                     self.trend=1
-            elif  data['roc_ema']<0:
-                    self.trend =0 
+            elif  data['roc_ema']<-0.1:
+                    self.trend =0
+            else:
+                self.trend = None 
                  
         else:
             self.trend = 2

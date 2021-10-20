@@ -122,6 +122,36 @@ class Indicator:
                   
 
         return df.dropna()
+    def _priceActionIndicators(self, df):
+        trend_long=talib.EMA(df.Close, timeperiod=89)              
+        trend_short=talib.EMA(df.Close, timeperiod=34)
+       # adx=ta.trend.ADXIndicator(df.High, df.Low, df.Close, window=14, fillna= False)
+        data = { 
+                
+              #  'bb_dif':100 * (bb_upper - bb_lower)/bb_lower,
+              #  'bb_upper':bb_upper,
+              #  'bb_lower':bb_lower,                                               
+                'trend_long':trend_long,                 
+                'trend_short':trend_short,    
+                'kri_ema':np.abs(100 * (trend_short - trend_long)/trend_long),                
+                'atr':talib.ATR(df.High, df.Low, df.Close, timeperiod=14),
+                'adxm':talib.ADX(df.High, df.Low, df.Close, timeperiod=14),
+                'rsi':talib.RSI(df.Close, timeperiod=14),
+               # 'hv': self._historicalVolatility(df, 14),
+                #'volume_osc':self._volOsc(df,14 )
+               
+
+                
+                
+            }
+        for i in data.keys():
+            if i not in df:
+                df.assign(key=np.nan)
+
+        for key, value in data.items():
+           # print(key, print(value))
+            df[key] = value
+        return df   
     def _envIndicators(self, df):
        # bb_upper, basis , bb_lower = talib.BBANDS(df.Close, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
         trend_long=talib.EMA(df.Close, timeperiod=144)              

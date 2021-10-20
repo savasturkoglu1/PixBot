@@ -16,7 +16,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.30
+        self.marginRate = 0.31
         self.stopRate = 2
         self.profitRate = 7
         
@@ -168,7 +168,7 @@ class Trade:
         self.leverage = int(kwargs['leverage'])
         self._setLeverage()
 
-        self.quantity = round((self.tradeMargin/kwargs['price'])*self.leverage,3)   
+        self.quantity = round((self.tradeMargin/kwargs['price'])*self.leverage,5)   
         self.profiQuantity = self.quantity/2 
         self.tradePrice = kwargs['price']
         self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
@@ -350,5 +350,5 @@ class Trade:
                     
         else:
             self.position =0
-        self._setStop() 
-        self._takeProfit()   
+       # self._setStop() 
+       # self._takeProfit()   
