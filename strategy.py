@@ -31,7 +31,7 @@ class Strategy:
 
         self.prc = {
             'BTCUSDT':0,
-            'ETHUSDT':0,
+            'ETHUSDT':2,
             'DOTUSDT':2,
             'ADAUSDT':3,
             'XRPUSDT':4
@@ -54,6 +54,7 @@ class Strategy:
         self.df_30m = None
         self.df_1h = None
         self.df_5m = None
+        self.df_1m = None
         self.live = None        
         self.market_ind = None
 
@@ -73,10 +74,10 @@ class Strategy:
         if self.bot_type == 'INDICATOR':
             self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
             self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
-    def _process(self, live , df_5m, df_15m, df_30m, df_1h):
+    def _process(self, live ,df_1m, df_5m, df_15m, df_30m, df_1h):
 
         ## set data frames
-        
+        self.df_1m = df_1m
         self.df_5m = df_5m
         self.df_15m = df_15m
         self.df_30m = df_30m
@@ -100,9 +101,10 @@ class Strategy:
 
         ## get signal
         self.signals = self.PA._getSignal(self.df_5m)
-
+        
         ## set order
         params = self._tradeParams()
+        print(self.coin,self.signals, params)
         if params is not None:
                 self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.signals))   
                 self.Trade._order(**params)  

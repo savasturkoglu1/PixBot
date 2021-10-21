@@ -92,7 +92,7 @@ class Data:
              self.df_1h = self._dataConvert(900000*4, self.df_1h)  
                
              
-             self.Strategy._process( row, self.df_5m, self.df_15m,self.df_30m, self.df_1h ) 
+             self.Strategy._process( row,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")

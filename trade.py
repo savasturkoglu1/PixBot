@@ -59,6 +59,14 @@ class Trade:
         self.forceTrade = False
         self.forceTradeCount =0
         self.triggerSide = None
+        self.prc = {
+            'BTCUSDT':3,
+            'ETHUSDT':3,
+            'DOTUSDT':1,
+            'ADAUSDT':2,
+            'XRPUSDT':1
+        }
+    
 
         
 
@@ -135,7 +143,7 @@ class Trade:
        
 
     def _placeOrder(self,order_type,params):
-        
+        print('place order with :',self.symbol,params)
         try:
             order = self.client.futures_create_order(**params)
             if order_type == 'OPEN_LONG' or order_type == 'OPEN_SHORT':   
@@ -165,11 +173,11 @@ class Trade:
     def _setPrice(self, **kwargs):
        
         self._checkBalance()
-        self.leverage = int(kwargs['leverage'])
-        self._setLeverage()
+        
+        self._setLeverage(int(kwargs['leverage']))
 
-        self.quantity = round((self.tradeMargin/kwargs['price'])*self.leverage,5)   
-        self.profiQuantity = self.quantity/2 
+        self.quantity = round((self.tradeMargin/kwargs['price']),self.prc[self.symbol])*self.leverage   
+        self.profiQuantity = round(self.quantity/2 ,self.prc[self.symbol])   
         self.tradePrice = kwargs['price']
         self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
         ## set stop   
@@ -186,6 +194,7 @@ class Trade:
             return
         if self.position is None:
             return     
+        print('stop order :', self.symbol, self.quantity, self.stopPrice)
         if  True: # self.orderStatus == 'FILLED':
             if typ =='STOP':
                 order = self.client.futures_create_order( 
@@ -216,11 +225,12 @@ class Trade:
 
     def _takeProfit(self):
        
-        
+        return 
         if  self.takeProfitStatus is True:
             return
         if self.position is None:
-            return     
+            return  
+        print('profit order :', self.symbol, self.profiQuantity, self.profitPrice)   
         if  True: # self.orderStatus == 'FILLED':
             
             order = self.client.futures_create_order( 
@@ -268,8 +278,9 @@ class Trade:
        # self._cancelOrder(self.stopOrder)
        
 
-    def _setLeverage(self):
-        self.client.futures_change_leverage(symbol=self.symbol, leverage=self.leverage)
+    def _setLeverage(self, leverage):
+        self.leverage = leverage
+        self.client.futures_change_leverage(symbol=self.symbol, leverage=leverage)
 
     #''' check current usdt balance '''
     def _checkBalance(self):
@@ -333,7 +344,7 @@ class Trade:
            self.quantity = self.quantity-self.profiQuantity
            
            self._cancelOrder(self.stopOrder)
-           self._setStop('TRAILING_STOP_MARKET')
+           self._setStop() #'TRAILING_STOP_MARKET'
     def _checkStop(self):
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.stopOrderId)
 
@@ -350,5 +361,12 @@ class Trade:
                     
         else:
             self.position =0
-       # self._setStop() 
-       # self._takeProfit()   
+        self._setStop() 
+        self._takeProfit()   
+
+
+if __name__ == '__main__':
+     from client import iClient
+     t = Trade(iClient().client,'XRPUSDT')
+     p ={'order_type': 'OPEN_SHORT', 'trade_type': 'SHORT', 'price': 1.137, 'stop_price': 1.134, 'stop_limit': 0.22, 'profit_price': 1.132, 'leverage': 5.0}
+     t._order(**p)

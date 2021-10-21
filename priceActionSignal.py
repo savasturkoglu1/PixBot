@@ -15,7 +15,7 @@ class  PriceAction():
 
         self.buy_point = None
         self.sell_point = None
-        self.range = 5
+        self.range = 9
         
         self.trade_price = None
         self.stop_price = None
@@ -26,8 +26,8 @@ class  PriceAction():
         self.trend = None
         self.stop_limit = None
         self.leverage = 2
-        self.candle_start = 'Low'
-        self.candle_end   = 'High'
+        self.candle_start = 'Open'
+        self.candle_end   = 'Close'
 
 
     def _getSignal(self,df):
@@ -48,15 +48,22 @@ class  PriceAction():
         adx = data['adxm']
 
 
-        csp_signal = self._candlePattern(df)
+        csp_signal = self._candlePattern(df[-3:])
 
         close  = df.iloc[-1].Close
-        range_ = 14 #5 if self.position is None else max(self.range, self.trade_len)
+        range_ = 5 if self.position is None else max(self.range, self.trade_len)
         min_ = df.tail(range_).Close.min()
         max_ = df.tail(range_).Close.max()
-        sp =np.abs(close-df.iloc[-2].Low) / close *100
+        sp =np.abs(close-df.iloc[-2].Open) / close *100
 
         p_range = -2 if sp<0.89 else -1 
+        if self.trade_len>12:
+            p_range = -3
+        if self.trade_len>30:
+            p_range = -5
+        if self.trade_len >60:
+            p_range  -10     
+
         p_range = p_range if self.trade_len<15 else -3
        
 
@@ -152,13 +159,13 @@ class  PriceAction():
         '''  adata process '''
         df['candle_length'] = df.apply(lambda x : np.abs(x['High']-x['Low']), axis=1 )
         df['candle_body'] = df.apply(lambda x : np.abs(x['Open']-x['Close']), axis=1 )
-        df['stic_body_ratio'] = df.apply(lambda x : x['candle_body']/x['candle_length']*100, axis=1 )
+        df['stick_body_ratio'] = df.apply(lambda x : x['candle_body']/x['candle_length']*100, axis=1 )
         opens = df.tail(3).Open.to_list()
         closes = df.tail(3).Close.to_list()
         
 
         ''' tree soders '''
-        if df.stic_body_ratio.min()>70:
+        if df.stick_body_ratio.min()>60:
             if opens == sorted(opens) and closes==sorted(closes):
                 direction = 'BULLISH'
             if opens == sorted(opens , reverse=True) and closes==sorted(closes, reverse=True):
