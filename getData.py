@@ -23,7 +23,7 @@ class GetData:
         self.look_back_short = look_back_short
 
         ## periods
-        self.periods = ['_1m','_5m','_15m'] #,'_30m','_1h'
+        self.periods = ['_1m'] #,'_30m','_1h','_5m','_15m'
         self.intervals = {
                     '_1m' : Client.KLINE_INTERVAL_1MINUTE,
                     '_5m' : Client.KLINE_INTERVAL_5MINUTE,
@@ -62,5 +62,5 @@ class GetData:
             data_ = self.client.get_historical_klines(self.coin, self.intervals[period], back)  
             df = pd.DataFrame(data_)
             
-            df =df.rename(columns={0: "Time", 1: "Open", 2:"High", 3:"Low", 4:"Close", 5:"Volum" }) #7:"Quote" , 8:"TradeNumber", 9:"BaseAsset", 10:"QuoteAsset"
+            df =df.rename(columns={0: "Time", 1: "Open", 2:"High", 3:"Low", 4:"Close", 5:"Volum", 6:"CloseTime" }) #7:"Quote" , 8:"TradeNumber", 9:"BaseAsset", 10:"QuoteAsset"
             df.to_csv(path)

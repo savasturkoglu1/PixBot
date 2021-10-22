@@ -18,7 +18,7 @@ class Data:
         self.coin = coin
         self.client = client
         self.Strategy = Strategy(self.client, self.coin)
-        self.max_len = 1000
+        self.max_len = 3000
         ## data frames
 
         self.df_5m = None
@@ -34,11 +34,11 @@ class Data:
         self.time = self.df_5m.tail(1).iloc[0]['Time'] if self.df_1m is not None else 0
 
     def _setDataframes(self):
-        self.df_1m = pd.read_csv(base_path+'/data/'+self.coin+'_1m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
-        self.df_5m = pd.read_csv(base_path+'/data/'+self.coin+'_5m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#   
-        self.df_15m = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
-        self.df_30m = pd.read_csv(base_path+'/data/'+self.coin+'_30m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])# 
-        self.df_1h = pd.read_csv(base_path+'/data/'+self.coin+'_1h.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
+        self.df_1m = pd.read_csv(base_path+'/data/'+self.coin+'_1m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
+        # self.df_5m = pd.read_csv(base_path+'/data/'+self.coin+'_5m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#   
+        # self.df_15m = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
+        # self.df_30m = pd.read_csv(base_path+'/data/'+self.coin+'_30m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])# 
+        # self.df_1h = pd.read_csv(base_path+'/data/'+self.coin+'_1h.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
        
 
 
@@ -52,11 +52,11 @@ class Data:
         event_time = resp.get('E')
 
         ''' df shortener'''
-        if self.df_5m.shape[0]>1200:
-            self.df_5m = self.df_5m.tail(self.max_len).copy()  
-            self.df_15m = self.df_15m.tail(self.max_len).copy()        
-            self.df_30m = self.df_30m.tail(self.max_len).copy()
-            self.df_1h = self.df_1h.tail(self.max_len).copy()
+        if self.df_1m.shape[0]>3500:
+            self.df_1m = self.df_1m.tail(self.max_len).copy()  
+            # self.df_15m = self.df_15m.tail(self.max_len).copy()        
+            # self.df_30m = self.df_30m.tail(self.max_len).copy()
+            # self.df_1h = self.df_1h.tail(self.max_len).copy()
         
      
 
@@ -70,6 +70,7 @@ class Data:
         
         w = {
                 "Time" :int(row['t']),
+                "CloseTime":int(row['T']),
                 "Open" :float(row["o"]),
                 "High" :float(row["h"]),
                 "Low" :float(row["l"]),
@@ -86,24 +87,29 @@ class Data:
         if event_time >=row["T"]:  #!= self.time:
             
              
-             self.df_5m = self._dataConvert(300000, self.df_5m)
-             self.df_15m = self._dataConvert(900000, self.df_15m)             
-             self.df_30m = self._dataConvert(900000*2, self.df_30m)  
-             self.df_1h = self._dataConvert(900000*4, self.df_1h)  
+             self.df_5m = self._dataConvert(300000)
+             self.df_15m = self._dataConvert(900000 )            
+             self.df_30m = self._dataConvert(900000*2)  
+             self.df_1h = self._dataConvert(900000*4)  
                
-             
-             self.Strategy._process( row,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h ) 
+             candle_close = True if row['t']%300000 else False
+             self.Strategy._process( row,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h, candle_close ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
-            # self._writeData()
+             self._writeData()
              print( 'time ', time )
 
 
         
         
-        
-    def _dataConvert(self, ms, df):
+    def _dataConvert(self, ms):
+        df =self.df_1m
+        df['TimeH'] = df.Time.apply(lambda x: x//ms)
+        d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
+         'Open':'first', 'Close':'last',"CloseTime":"last", 'Volum':'sum'}).reset_index()
+        return d
+    def _dataConvert2(self, ms, df):
         
 
         
@@ -127,7 +133,7 @@ class Data:
             
      
 
-
+         self.df_5m.to_csv(base_path+'/data/obs/'+self.coin+'df_5m.csv')
          self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')
          self.df_30m.to_csv(base_path+'/data/obs/'+self.coin+'df_30m.csv')
          self.df_5m.to_csv(base_path+'/data/obs/'+self.coin+'df_5m.csv')

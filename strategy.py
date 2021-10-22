@@ -66,7 +66,9 @@ class Strategy:
         self.params = None
         self.position = None
         self.intval =60000
+        
 
+        self.candle_close = None
         self.trade_signal = None
         self.trade_count = None
         self.trade_perm = False
@@ -74,7 +76,7 @@ class Strategy:
         if self.bot_type == 'INDICATOR':
             self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
             self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
-    def _process(self, live ,df_1m, df_5m, df_15m, df_30m, df_1h):
+    def _process(self, live ,df_1m, df_5m, df_15m, df_30m, df_1h, candle_close):
 
         ## set data frames
         self.df_1m = df_1m
@@ -83,6 +85,7 @@ class Strategy:
         self.df_30m = df_30m
         self.df_1h = df_1h
         self.live  = live
+      
 
         self.Trade._live(live)
         if self.bot_type=='PACTION':

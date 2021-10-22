@@ -176,7 +176,7 @@ class Trade:
         
         self._setLeverage(int(kwargs['leverage']))
 
-        self.quantity = round((self.tradeMargin/kwargs['price']),self.prc[self.symbol])*self.leverage   
+        self.quantity =round(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])   
         self.profiQuantity = round(self.quantity/2 ,self.prc[self.symbol])   
         self.tradePrice = kwargs['price']
         self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
@@ -358,9 +358,15 @@ class Trade:
         self.orderStatus = order['status']
         if self.order['side'] == 'BUY':
             self.position =1
+            self._setStop() 
+            self._takeProfit()
                     
-        else:
+        elif self.order['side'] == 'SELL':
             self.position =0
+            self._setStop() 
+            self._takeProfit()
+        else:
+            self.position = None
         self._setStop() 
         self._takeProfit()   
 
