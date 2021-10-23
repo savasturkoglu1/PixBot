@@ -97,7 +97,7 @@ class Data:
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
-             self._writeData()
+             #self._writeData()
              print( 'time ', time )
 
 

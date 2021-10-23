@@ -33,8 +33,9 @@ class Logs():
         
 
         if d !=self.logday:
-            d = d.replace('-','_')
             self.logday = d
+            d = d.replace('-','_')
+            
             file_n = base_path+'/logs/trade_logs_'+d+'.log'
             #file = open(file_n,'a+')
             logging.basicConfig(filename=file_n, 

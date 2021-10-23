@@ -72,10 +72,10 @@ class Strategy:
         self.trade_signal = None
         self.trade_count = None
         self.trade_perm = False
-        self.bot_type = 'PACTION' # 'INDICATOR', 
-        if self.bot_type == 'INDICATOR':
-            self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
-            self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
+        self.bot_type = 'PACTION' #'PACTION' # 'INDICATOR', 
+        # if self.bot_type == 'INDICATOR':
+        #     self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
+        #     self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
     def _process(self, live ,df_1m, df_5m, df_15m, df_30m, df_1h, candle_close):
 
         ## set data frames
@@ -113,23 +113,48 @@ class Strategy:
                 self.Trade._order(**params)  
     def _indicatorSignal(self):
         self.Trade._live(self.live)
-        self._getMarket()
-        self._getStrategy()
+        # self._getMarket()
+        # self._getStrategy()
 
-        if self.params['time_frame'] == '30m':
-            self.df = self.df_30m
-            self.intval = self.intval*30
-        elif self.params['time_frame'] == '1h':
-            self.df = self.df_1h
-            self.intval = self.intval*60
-        elif self.params['time_frame'] == '5m':
-            self.df = self.df_5m
-            self.intval = self.intval*5
-        else:
-            self.df = self.df_15m 
-            self.intval = self.intval*15
+        # if self.params['time_frame'] == '30m':
+        #     self.df = self.df_30m
+        #     self.intval = self.intval*30
+        # elif self.params['time_frame'] == '1h':
+        #     self.df = self.df_1h
+        #     self.intval = self.intval*60
+        # elif self.params['time_frame'] == '5m':
+        #     self.df = self.df_5m
+        #     self.intval = self.intval*5
+        # else:
+        #     self.df = self.df_15m 
+        #     self.intval = self.intval*15
+
+        self.df = self.df_5m
         
-            
+        self.params = {'Unnamed: 0': 42818,
+                    'ema_len': 5.0,
+                    'till': 0.9,
+                    'trend_type': 'False',
+                    'trend_period': 144,
+                    'signal_filter': 'False',
+                    'filter_period': 'DYN',
+                    'price_filter': False,
+                    'stop_indicator': 'atr',
+                    'take_profit': False,
+                    'trailing_stop': False,
+                    'strategy': 'TILLSON',
+                    'atr_len': np.nan,
+                    'ma_len': np.nan,
+                    'multipiler': np.nan,
+                    'pmax_ma_type': np.nan,
+                    'macd_period': np.nan,
+                    'macd_ma_type': np.nan,
+                    'macd_type': np.nan,
+                    'macd_src_type': np.nan,
+                    'ma_type': np.nan,
+                    'ema_length': np.nan,
+                    'time_frame': '15m',
+                    'unique': '7ZB34DTV'}     
        
         self.position = self.Trade.position
         if self.position is None:
@@ -140,7 +165,7 @@ class Strategy:
         params = self._tradeParams()
         
         
-        
+        print(self.coin,self.signals, params)
         if  params is not None and self.trade_perm is True : 
            self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.params))   
            self.Trade._order(**params)
