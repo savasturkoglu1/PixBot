@@ -258,15 +258,15 @@ class Signals:
 
         if True: #kwargs['stop_indicator'] == 'atr':
             if self.long_flag is True:
-                self.stop_price = data['Close']-2*data['atr']
+                self.stop_price = data['Close']-1*data['atr']
             if self.short_flag is True:
-                self.stop_price = data['Close']+2*data['atr']
+                self.stop_price = data['Close']+1*data['atr']
             #print(data['atr'], self.stop_price)
 
         if kwargs['stop_indicator'] != 'solid':
             self.stop_limit = np.abs(data['Close']-self.stop_price)/data['Close']*100
             
-            self.leverage  =max(min(np.ceil(3/self.stop_limit) ,6),2)
+            self.leverage  =max(min(np.ceil(2/self.stop_limit) ,6),2)
           
             
         else:

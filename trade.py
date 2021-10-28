@@ -16,7 +16,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.31
+        self.marginRate = 0.32
         self.stopRate = 2
         self.profitRate = 7
         
@@ -225,7 +225,7 @@ class Trade:
 
     def _takeProfit(self):
        
-        return 
+        
         if  self.takeProfitStatus is True:
             return
         if self.position is None:
