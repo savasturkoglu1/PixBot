@@ -342,7 +342,7 @@ class Trade:
         if order['status'] == 'FILLED':
            
            self.quantity = self.quantity-self.profiQuantity
-           
+           self.stopLimit = self.tradePrice
            self._cancelOrder(self.stopOrder)
            self._setStop() #'TRAILING_STOP_MARKET'
     def _checkStop(self):

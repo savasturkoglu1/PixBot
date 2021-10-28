@@ -213,6 +213,7 @@ class  PriceAction():
 
         max_ = df.loc[max_index].Close
         min_  = df.loc[min_index].Close
+        last_index = df.index[-1]
         
         bp = max(df.loc[min_index+point_range+1][self.candle_start],df.iloc[min_index+point_range+1][self.candle_end])
 
@@ -226,12 +227,12 @@ class  PriceAction():
             else:
                 self.sell_point = min(sp, max_*(1-0.003))
         if self.sell_point is not None:  
-            if trade_ratio>0.4:             
+            if trade_ratio>0.4 :             
                self.sell_point = min(sp, max_*(1-0.003))
              
                
         if self.buy_point is not  None:
-            if trade_ratio>0.4:
+            if trade_ratio>0.4 : 
                self.buy_point = max(bp, min_*1.003)  
 
 
