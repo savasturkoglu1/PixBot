@@ -229,7 +229,7 @@ class Trade:
 
     def _takeProfit(self):
        
-        
+        return
         if  self.takeProfitStatus is True:
             return
         if self.position is None:

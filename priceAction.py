@@ -106,7 +106,7 @@ class  PriceAction():
             # self.sell_point = df[-5:-1]['Close'].min()            
              self.stop_price = data['Close']-atr[-1]*2
              
-             row['open_positio'] = 'OPEN_LONG'
+             row['open_position'] = 'OPEN_LONG'
              row['position'] = 'OPEN_LONG'
         elif self.signal == 0 and self.trend in [0,2] and self.short_flag is False:
 
@@ -120,7 +120,7 @@ class  PriceAction():
              self.stop_price =data['Close']+atr[-1]*2              
             # self.buy_point =df[-5:-1]['Open'].max()
               
-             row['open_positio'] = 'OPEN_SHORT'
+             row['open_position'] = 'OPEN_SHORT'
              row['position'] = 'OPEN_SHORT'
         else:
 
@@ -206,7 +206,7 @@ class  PriceAction():
                 r =1  if  self._candleType(df.iloc[self.max_index-1]) == 'BULL' else 2 
                 # df.iloc[self.max_index-1].Close > df.iloc[self.max_index-1].Open else 2
                 if self.trade_len>5 or self.sell_point is None :
-                  self.sell_point = min(df.iloc[self.max_index-r].Open, df.iloc[self.max_index-r].Close)
+                   self.sell_point = min(df.iloc[self.max_index-r].Open, df.iloc[self.max_index-r].Close)
                 
                 self.buy_point  = max_ 
                 self.stop_price = max_
