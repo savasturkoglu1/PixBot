@@ -47,7 +47,7 @@ class  PriceAction():
         data = df.iloc[-1].to_dict()
         close  = df.iloc[-1].Close
        
-        row ={'Time':data['Time'],'position':np.nan,'open_position':np.nan, 'close_positio':np.nan,
+        row ={'Time':data['Time'],'position':np.nan,'open_position':np.nan, 'close_position':np.nan,
         'open_long':np.nan,'close_long':np.nan,'open_short':np.nan,
         'close_short':np.nan,'stop_price':np.nan, 'trailing_stop':np.nan,
                 'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan}
@@ -76,7 +76,7 @@ class  PriceAction():
             self.entry_point =None
             
             row['position'] = 'CLOSE_SHORT'
-            row['close_positio'] = 'CLOSE_SHORT'
+            row['close_position'] = 'CLOSE_SHORT'
 
         elif self.signal==0 and self.long_flag is True:
             row['close_long'] = data['Close']
@@ -85,9 +85,9 @@ class  PriceAction():
            
             self.trade_len = 0
             row['position'] = 'CLOSE_LONG'
-            row['close_positio'] = 'CLOSE_LONG'
+            row['close_position'] = 'CLOSE_LONG'
         else:
-            row['close_positio'] =  None
+            row['close_position'] =  None
         
         if  self.long_flag is True or self.short_flag is True:
                     self.trade_len +=1
