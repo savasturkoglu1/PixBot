@@ -10,7 +10,6 @@ from env  import base_path
 
 
 
-
 class GetData:
 
     def __init__(self, client,coin,look_back=1, look_back_short=1):
@@ -64,3 +63,12 @@ class GetData:
             
             df =df.rename(columns={0: "Time", 1: "Open", 2:"High", 3:"Low", 4:"Close", 5:"Volum", 6:"CloseTime" }) #7:"Quote" , 8:"TradeNumber", 9:"BaseAsset", 10:"QuoteAsset"
             df.to_csv(path)
+
+
+if __name__ == '__main__':
+   
+    
+    from client import iClient
+    coin = 'ETHUSDT'
+    d = GetData(iClient().client,coin)
+    d._getData()

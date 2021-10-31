@@ -16,7 +16,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.32
+        self.marginRate = 0.90
         self.stopRate = 2
         self.profitRate = 7
         
@@ -197,7 +197,7 @@ class Trade:
         print('stop order :', self.symbol, self.quantity, self.stopPrice)
         if  True: # self.orderStatus == 'FILLED':
             if typ =='STOP':
-                order = self.client.futures_create_order( 
+                params = dict( 
                             symbol=self.symbol, 
                             quantity=self.quantity, 
                             side= self.triggerSide,
@@ -208,7 +208,7 @@ class Trade:
                             #timeInForce=Client.TIME_IN_FORCE_GTC
                         )
             if typ=='TRAILING_STOP_MARKET':
-                order = self.client.futures_create_order( 
+                params = dict( 
                             symbol=self.symbol, 
                             quantity=self.quantity, 
                             side= self.triggerSide,
@@ -218,10 +218,14 @@ class Trade:
                             #stopPrice = self.stopPrice
                             #timeInForce=Client.TIME_IN_FORCE_GTC
                         )
-            if order['orderId']:
-                self.stopOrderId = order['orderId']
-                self.setStopStatus = True
-                self.stopOrder  = order      
+            try:
+                order = self.client.futures_create_order(**params)
+                if order['orderId']:
+                    self.stopOrderId = order['orderId']
+                    self.setStopStatus = True
+                    self.stopOrder  = order 
+            except BinanceAPIException as e:
+                 self.Logs._writeLog('order error  '+ str(e))     
 
     def _takeProfit(self):
        
@@ -232,21 +236,23 @@ class Trade:
             return  
         print('profit order :', self.symbol, self.profiQuantity, self.profitPrice)   
         if  True: # self.orderStatus == 'FILLED':
-            
-            order = self.client.futures_create_order( 
-                        symbol=self.symbol, 
-                        quantity=self.profiQuantity, 
-                        side= self.triggerSide,
-                        type='TAKE_PROFIT',
-                        price = self.profitPrice,          
-                        stopPrice = self.profitPrice
-                        #timeInForce=Client.TIME_IN_FORCE_GTC
-                        )
-            
-            if order['orderId']:
-                self.profitOrderId = order['orderId']
-                self.takeProfitStatus = True
-                self.profitOrder  = order 
+            try:
+                order = self.client.futures_create_order( 
+                            symbol=self.symbol, 
+                            quantity=self.profiQuantity, 
+                            side= self.triggerSide,
+                            type='TAKE_PROFIT',
+                            price = self.profitPrice,          
+                            stopPrice = self.profitPrice
+                            #timeInForce=Client.TIME_IN_FORCE_GTC
+                            )
+                
+                if order['orderId']:
+                    self.profitOrderId = order['orderId']
+                    self.takeProfitStatus = True
+                    self.profitOrder  = order 
+            except BinanceAPIException as e:
+                 self.Logs._writeLog('order error  '+ str(e))  
 
     def _clearTrade(self):
         

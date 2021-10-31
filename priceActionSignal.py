@@ -56,10 +56,7 @@ class  PriceAction():
         
 
         ''' indicators '''
-        # trend_short = data['trend_short']
-        # trend_long= data['trend_long']
-        # kema = data['kri_ema']
-        # adx = data['adxm']
+       
         rsi = data['rsi']
 
         ''' get candle stick pattern signal '''
@@ -67,41 +64,51 @@ class  PriceAction():
 
         
         
-        self._pointSetter(df)
+        self._pSetter(df)
+
+        if close<self.sell_point:
+            self.signal = 0
+        elif close>self.buy_point:
+            self.signal = 1
+        else:
+            self.signal = None
+
+        
+           
        
                 
 
-        if self.sell_point is not None:
+        # if self.sell_point is not None:
          
-            if  close<self.sell_point or csp_signal == 'BEARISH':
+        #     if  close<self.sell_point or csp_signal == 'BEARISH':
                                         
-                    self.signal = 0
-                    self.signal_time +=1
+        #             self.signal = 0
+        #             self.signal_time +=1
                     
-            else:
-                self.signal_time = 0
-                self.signal = None 
-                if candle_close is True and self.long_flag is True:
-                    self.trade_len +=1 
+        #     else:
+        #         self.signal_time = 0
+        #         self.signal = None 
+        #         if candle_close is True and self.long_flag is True:
+        #             self.trade_len +=1 
         
-        elif self.buy_point is not None:
+        # elif self.buy_point is not None:
 
-            if  close>self.buy_point or csp_signal == 'BULLISH': 
-                if True: 
-                    self.signal = 1
-                    self.signal_time +=1
-            else:
-                self.signal_time = 0
-                self.signal = None               
+        #     if  close>self.buy_point or csp_signal == 'BULLISH': 
+        #         if True: 
+        #             self.signal = 1
+        #             self.signal_time +=1
+        #     else:
+        #         self.signal_time = 0
+        #         self.signal = None               
                 
-                if candle_close is True and self.short_flag is True:
-                    self.trade_len +=1 
+        #         if candle_close is True and self.short_flag is True:
+        #             self.trade_len +=1 
 
 
         
         
-        if  self.signal_time<2:
-              self.signal = None
+        # if  self.signal_time<2:
+        #       self.signal = None
        
         # if rsi >60:
         #     self.trend = 1
@@ -109,7 +116,7 @@ class  PriceAction():
         #     self.trend = 0
         # else:
         self.trend = 2    
-        if self._miMaxRatio(df, self.check_len)<1:
+        if self._miMaxRatio(df, self.check_len)<0.7:
               self.trend = None
         
 
@@ -120,7 +127,7 @@ class  PriceAction():
             self.entry_point =None
             
             row['position'] = 'CLOSE_SHORT'
-            
+            row['close_positio'] = 'CLOSE_SHORT'
 
         elif self.signal==0 and self.long_flag is True:
             row['close_long'] = data['Close']
@@ -129,21 +136,24 @@ class  PriceAction():
            
             self.trade_len = 0
             row['position'] = 'CLOSE_LONG'
+            row['close_positio'] = 'CLOSE_LONG'
+        else:
+            row['close_positio'] =  None
             
 
-        elif self.signal == 1 and self.trend in [1,2] and self.long_flag is False:
+        if self.signal == 1 and self.trend in [1,2] and self.long_flag is False:
              row['open_long'] = data['Close']
              self.long_flag = True
              self.entry_point = data['Close']
              
              self.trade_len = 0
-             self.buy_point = None
+             #self.buy_point = None
              self.signal_time = 0
-             self.sell_point = df[-5:-1]['Close'].min()
+            # self.sell_point = df[-5:-1]['Close'].min()
             
-             self.stop_price = df[-3:-1]['Close'].min()
+             #self.stop_price = df[-3:-1]['Close'].min()
              
-
+             row['open_positio'] = 'OPEN_LONG'
              row['position'] = 'OPEN_LONG'
         elif self.signal == 0 and self.trend in [0,2] and self.short_flag is False:
              row['open_short'] = data['Close']
@@ -152,21 +162,23 @@ class  PriceAction():
              self.entry_point = data['Close']
              self.trade_len=0 
              self.signal_time = 0
-             self.sell_point = None
-             self.stop_price =df[-3:-1]['Open'].max()  
+            # self.sell_point = None
+            # self.stop_price =df[-3:-1]['Open'].max()  
 
             
-             self.buy_point =df[-5:-1]['Open'].max()
+            # self.buy_point =df[-5:-1]['Open'].max()
               
-             
+             row['open_positio'] = 'OPEN_SHORT'
 
              row['position'] = 'OPEN_SHORT'
+        else:
+            row['open_position'] = None
             
         
 
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(data['Close']-self.stop_price)/data['Close']*100            
-           self.leverage  =   max(min(np.ceil(1/self.stop_limit) ,5),2)
+           self.leverage  =   max(min(np.ceil(2/self.stop_limit) ,6),2)
 
            take_profit = None
            if   True: # 
@@ -183,41 +195,57 @@ class  PriceAction():
         
         
         return row
-        
+    def _pSetter(self,df):
+        df= df.tail(3000).copy().reset_index(drop=True)
+        trade_range = 13
+        self.max_index = df[-trade_range:]['Close'].argmax()
+        self.min_index = df[-trade_range:]['Close'].argmin()
+        max_ = df[-trade_range:]['Close'].max()
+        min_  = df[-trade_range:]['Close'].min()
+        if self.max_index>self.min_index:
+            r = 1 if df.iloc[-2].Close > df.iloc[-2].Open else 2
+            self.sell_point = df.iloc[self.max_index-r].Open
+            self.buy_point  = max_
+            self.stop_price = max_
+        elif self.max_index<self.min_index:
+            r = 1 if df.iloc[-2].Close < df.iloc[-2].Open else 2
+            self.buy_point = df.iloc[self.max_index-r].Open
+            self.sell_point  = min_
+            self.stop_price = min_
     def _pointSetter(self, df):
         
         data = df.iloc[-1].to_dict()
         close = data['Close'] 
-        trade_range =7 if self.short_flag is False and self.long_flag is False else   max(self.trade_len,3)
+        trade_range =7 if self.short_flag is False and self.long_flag is False else   max(self.trade_len,5)
         
         
         sp =np.abs(close-df.iloc[-2].Open) / close *100
         
 
       
-        point_range = -2 if sp< 1 else -1 
-        point_range = -2 if self.trade_len<4 else point_range
-        if self.trade_len>13:
-            point_range = -3
-        if self.trade_len>20:
-            point_range = -5
-        if self.trade_len>30:
-            point_range = -6
-        if self.trade_len >60:
-            point_range  -8
-        
+        # point_range = -2 if sp< 1 else -1 
+        # point_range = -2 if self.trade_len<4 else point_range
+        # if self.trade_len>13:
+        #     point_range = -3
+        # if self.trade_len>20:
+        #     point_range = -5
+        # if self.trade_len>30:
+        #     point_range = -6
+        # if self.trade_len >60:
+        #     point_range  -8
+        point_range = -2  if self.trade_len<6 else -int(np.ceil(self.trade_len/5))
 
        
-        max_index = df[-trade_range:]['Close'].idxmax()
-        min_index = df[-trade_range:]['Close'].idxmin()
+        max_index = df[-trade_range:-1]['Close'].idxmax()
+        min_index = df[-trade_range:-1]['Close'].idxmin()
 
         max_ = df.loc[max_index].Close
         min_  = df.loc[min_index].Close
         last_index = df.index[-1]
         
-        bp = max(df.loc[min_index+point_range+1][self.candle_start],df.iloc[min_index+point_range+1][self.candle_end])
+        bp = max(df.loc[min_index+point_range][self.candle_start],df.iloc[min_index+point_range][self.candle_end])
 
-        sp = min(df.loc[max_index+point_range+1][self.candle_start], df.iloc[max_index+point_range+1][self.candle_end])
+        sp = min(df.loc[max_index+point_range][self.candle_start], df.iloc[max_index+point_range][self.candle_end])
         
         trade_ratio = np.abs(self.entry_point-close)/self.entry_point*100 if self.entry_point is not None else 1
         if self.buy_point is None and self.sell_point is None:
