@@ -15,7 +15,7 @@ class  PriceAction():
 
         self.buy_point = None
         self.sell_point = None
-        self.range = 9
+        self.range = 14
         
         self.trade_price = None
         self.stop_price = None
@@ -65,7 +65,7 @@ class  PriceAction():
             self.signal = None
 
         self.trend = 2    
-        if self._miMaxRatio(df, self.check_len)<0.3:
+        if self._miMaxRatio(df, self.check_len)<0.55:
               self.trend = None
         
 
@@ -103,8 +103,8 @@ class  PriceAction():
              self.trade_len = 1             
            
 
-            # self.sell_point = df[-5:-1]['Close'].min()            
-             self.stop_price = data['Close']-atr[-1]*1.5
+            # self.sell_point =             
+             self.stop_price = max(data['Close']-atr[-1]*1.5,df[-3:-1]['Close'].min())
              
              row['open_position'] = 'OPEN_LONG'
              row['position'] = 'OPEN_LONG'
@@ -117,7 +117,7 @@ class  PriceAction():
              self.entry_index = df.tail(1).index[-1]
              self.trade_len=1         
             
-             self.stop_price =data['Close']+atr[-1]*1.5             
+             self.stop_price =min(data['Close']+atr[-1]*1.5 ,df[-3:-1]['Close'].max())            
             # self.buy_point =df[-5:-1]['Open'].max()
               
              row['open_position'] = 'OPEN_SHORT'
@@ -171,7 +171,7 @@ class  PriceAction():
         else:
             # sel_level =  '0.382'
             # buy_level =  '0.618'
-            tresh = 0.001
+            tresh = 0.002
         fib_levels = self._calculateFib(min_, max_ )
         
         
