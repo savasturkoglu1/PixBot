@@ -197,7 +197,7 @@ class  PriceAction():
 
         trade_ratio = np.abs(self.entry_point-df.iloc[-2].Close)/self.entry_point*100 if self.entry_point is not None else 5
         df= df.tail(3000).reset_index(drop=True)
-        trade_range = min(self.trade_len+3, 7)
+        trade_range = max(self.trade_len+3, 7)
         
         self.max_index = df[-trade_range:-1]['Close'].idxmax()
         self.min_index = df[-trade_range:-1]['Close'].idxmin()
