@@ -21,7 +21,7 @@ class  PriceAction():
         self.stop_price = None
         self.profit_price = None
         self.trade_len = 0
-        self.check_len = 34
+        self.check_len = 13
         self.signal_time = 0
         
         self.signal = None
@@ -104,7 +104,7 @@ class  PriceAction():
            
 
             # self.sell_point = df[-5:-1]['Close'].min()            
-             self.stop_price = data['Close']-atr[-1]*2
+             self.stop_price = data['Close']-atr[-1]*1.5
              
              row['open_position'] = 'OPEN_LONG'
              row['position'] = 'OPEN_LONG'
@@ -117,7 +117,7 @@ class  PriceAction():
              self.entry_index = df.tail(1).index[-1]
              self.trade_len=1         
             
-             self.stop_price =data['Close']+atr[-1]*2              
+             self.stop_price =data['Close']+atr[-1]*1.5             
             # self.buy_point =df[-5:-1]['Open'].max()
               
              row['open_position'] = 'OPEN_SHORT'
@@ -159,20 +159,33 @@ class  PriceAction():
         min_  = df[-trade_range:-1]['Close'].min()
         
         
+        min_max_ratio = (max_-min_)/min_*100
+
+        sel_level = '0.236' 
+        buy_level = '0.786'
+        if min_max_ratio >4:
+
+            sel_level = '0.236' 
+            buy_level = '0.786' 
+            tresh = 0.003
+        else:
+            # sel_level =  '0.382'
+            # buy_level =  '0.618'
+            tresh = 0.001
         fib_levels = self._calculateFib(min_, max_ )
         
         
         if self.max_index>self.min_index:
             
                 self.buy_point =  max_
-                self.sell_point =  fib_levels['0.236']*(1-0.003)
+                self.sell_point =  fib_levels[sel_level]*(1-tresh)
                 
         elif self.max_index<self.min_index:
                 
                 self.sell_point = min_
-                self.buy_point = fib_levels['0.786']*(1.003)
+                self.buy_point = fib_levels[buy_level]*(1+tresh)
     def _calculateFib(self,  min_, max_):
-           # df    = self.df[-self.fib_len:].reset_index()
+        
                
         levels = {}
         diff = max_-min_
@@ -184,27 +197,22 @@ class  PriceAction():
 
         trade_ratio = np.abs(self.entry_point-df.iloc[-2].Close)/self.entry_point*100 if self.entry_point is not None else 5
         df= df.tail(3000).reset_index(drop=True)
-        trade_range = min(self.trade_len+3, 13)
+        trade_range = min(self.trade_len+3, 7)
         
         self.max_index = df[-trade_range:-1]['Close'].idxmax()
         self.min_index = df[-trade_range:-1]['Close'].idxmin()
         max_ = df[-trade_range:-1]['Close'].max()
         min_  = df[-trade_range:-1]['Close'].min()
 
-        if self.entry_point is not None:
-            peak = max_ if self.max_index>self.min_index else min_
-            self.percentage = np.abs(self.entry_point-peak)/self.entry_point*100         
-           
-        else:
-            self.percentage = 0
+        self.percentage = (max_-min_)/min_*100
 
-        if self.trade_len >11 and self.percentage>1:          
+        if self.trade_len >7 and self.percentage>0.89:          
              
-            self._longBox(df)
+            self._longBox(df)    
         else:
             if self.max_index>self.min_index:
                 r =1  if  self._candleType(df.iloc[self.max_index-1]) == 'BULL' else 2 
-                # df.iloc[self.max_index-1].Close > df.iloc[self.max_index-1].Open else 2
+                
                 if self.trade_len>5 or self.sell_point is None :
                    self.sell_point = min(df.iloc[self.max_index-r].Open, df.iloc[self.max_index-r].Close)
                 
@@ -212,7 +220,7 @@ class  PriceAction():
                 self.stop_price = max_
             elif self.max_index<self.min_index:
                 r =1  if  self._candleType(df.iloc[self.max_index-1]) == 'BEAR' else 2 
-                #1 if df.iloc[self.min_index-1].Close < df.iloc[self.min_index-1].Open else 2
+                
                 if self.trade_len>5 or self.buy_point is None:
                   self.buy_point = max(df.iloc[self.min_index-r].Open, df.iloc[self.min_index-r].Close)
                 self.sell_point  = min_ 
@@ -224,12 +232,12 @@ class  PriceAction():
         return r 
   
     def _candleType(self, row):
-            candle_length= np.abs(row['High']-row['Low'])
-            candle_length= np.abs(row['Open']-row['Close'])
-            stick_body_ratio= candle_length/candle_length*100
-            direction=  'BULL' if  row['Open']<row['Close'] else 'BEAR'
-            direction=  'DOJI' if stick_body_ratio<5 else  direction
-            return direction
+        candle_length= np.abs(row['High']-row['Low'])
+        body_length= np.abs(row['Open']-row['Close'])
+        stick_body_ratio= body_length/candle_length*100
+        direction=  'BULL' if  row['Open']<row['Close'] else 'BEAR'
+        direction=  'DOJI' if stick_body_ratio<5 else  direction
+        return direction
 
               
 

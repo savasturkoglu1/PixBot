@@ -92,8 +92,8 @@ class Data:
              self.df_30m = self._dataConvert(900000*2)  
              self.df_1h = self._dataConvert(900000*4)  
                
-             candle_close = True if (row['T']+1)%300000 else False
-             self.Strategy._process( row,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h, candle_close ) 
+             candle_close = True if (row['T']+1)%300000==0 else False
+             self.Strategy._process( w,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h, candle_close ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")

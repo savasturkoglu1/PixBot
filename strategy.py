@@ -110,21 +110,23 @@ class Strategy:
         print(self.candle_close)
         if self.candle_close:
             self.signals = self.PA._getSignal(self.df_5m)
-            
+            self.close = False
             ## set order
         if self.signals is not None:
             if self.close is True:
                 self.signals['close_position'] = None
                 if self.signals['open_position'] == 'OPEN_LONG':
-                    if self.live['Close'] <= self.signals['open_long']:
+                    if self.live['Close'] < self.signals['open_long']:
                         self.signals['open_position'] = None
                     else:     
-                        self.signals['open_position'] = self.live['Close']
+                        self.signals['open_position'] ='OPEN_LONG' 
+                        self.signals['open_long'] =  self.live['Close']
                 if self.signals['open_position'] == 'OPEN_SHORT':
-                    if self.live['Close'] >= self.signals['open_short']:
+                    if self.live['Close'] > self.signals['open_short']:
                         self.signals['open_position'] = None
                     else:     
-                        self.signals['open_position'] = self.live['Close']
+                        self.signals['open_position'] = 'OPEN_SHORT'
+                        self.signals['open_short'] =  self.live['Close']
             
 
             params = self._tradeParams()
@@ -133,7 +135,7 @@ class Strategy:
             if params is not None:
                     self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.signals)) 
                     if self.signals['close_position'] is not None:
-                        self.close = True  
+                        self.close = True                         
                     else:
                         self.close = False
                     self.Trade._order(**params)  
