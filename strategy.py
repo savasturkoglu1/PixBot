@@ -106,6 +106,8 @@ class Strategy:
            self.PA.trade_len = 0
            self.PA.entry_point =None               
            self.PA.entry_index = None  
+           
+           self.position = None
         ## get signal
         print(self.candle_close)
         if self.candle_close:
@@ -135,9 +137,12 @@ class Strategy:
             if params is not None:
                     self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.signals)) 
                     if self.signals['close_position'] is not None:
-                        self.close = True                         
-                    else:
+                        self.close = True   
+                                          
+                    elif self.signals['open_position'] is not None:
+                        self.params = None
                         self.close = False
+                        
                     self.Trade._order(**params)  
 
     def _tradeParams(self):
