@@ -3,7 +3,7 @@ import logging
 from env import base_path
 from datetime import datetime
 
-
+import logging.config
  
 
 
@@ -15,10 +15,10 @@ class Logs():
         self.logger=logging.getLogger() 
         self.logger.setLevel(logging.DEBUG)
         self._setLogger()
-        
+        #logging.getLogger('client').disabled
 
     def _writeLog(self, message, level='info'):
-        self._setLogger()
+        self._setLogger() 
         if level == "info":
                 self.logger.info(message)
         elif level == "warning":
@@ -38,8 +38,16 @@ class Logs():
             
             file_n = base_path+'/logs/trade_logs_'+d+'.log'
             #file = open(file_n,'a+')
-            logging.basicConfig(filename=file_n, 
+            rfh = logging.handlers.RotatingFileHandler(
+                filename=file_n, 
+                mode='w',
+                maxBytes=5*1024*1024,
+                backupCount=10000,
+                encoding=None,
+                delay=0
+            )
+            logging.basicConfig( 
                                 format='%(asctime)s %(message)s', 
-                                filemode='w')
+                                handlers=[ rfh ])
             self.logger=logging.getLogger() 
             self.logger.setLevel(logging.DEBUG)

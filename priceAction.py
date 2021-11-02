@@ -65,7 +65,7 @@ class  PriceAction():
             self.signal = None
 
         self.trend = 2    
-        if self._miMaxRatio(df, self.check_len)<0.55:
+        if self._miMaxRatio(df, self.check_len)<0.21:
               self.trend = None
         
 
@@ -104,7 +104,7 @@ class  PriceAction():
            
 
             # self.sell_point =             
-             self.stop_price = max(data['Close']-atr[-1]*1.5,df[-3:-1]['Close'].min())
+             self.stop_price = max(data['Close']-atr[-1]*1,df[-3:-1]['Close'].min())
              
              row['open_position'] = 'OPEN_LONG'
              row['position'] = 'OPEN_LONG'
@@ -117,7 +117,7 @@ class  PriceAction():
              self.entry_index = df.tail(1).index[-1]
              self.trade_len=1         
             
-             self.stop_price =min(data['Close']+atr[-1]*1.5 ,df[-3:-1]['Close'].max())            
+             self.stop_price =min(data['Close']+atr[-1]*1 ,df[-3:-1]['Close'].max())            
             # self.buy_point =df[-5:-1]['Open'].max()
               
              row['open_position'] = 'OPEN_SHORT'
@@ -130,7 +130,7 @@ class  PriceAction():
 
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(data['Close']-self.stop_price)/data['Close']*100            
-           self.leverage  =   max(min(np.ceil(1.21/self.stop_limit) ,5),2)
+           self.leverage  =   max(min(np.ceil(0.89/self.stop_limit) ,5),2)
 
            take_profit = None
            if   False: # 
@@ -140,7 +140,7 @@ class  PriceAction():
                      take_profit =(1-self.stop_limit/100*3)*data['Close']
            row['leverage'] = self.leverage
            row['stop_limit'] = self.stop_limit
-           row['stop_price'] = self.stop_price*(1.001) if self.short_flag is True else self.stop_price*(1-0.001)
+           row['stop_price'] = self.stop_price*(1.0005) if self.short_flag is True else self.stop_price*(1-0.0005)
            row['take_profit'] = take_profit
         
       
@@ -150,7 +150,7 @@ class  PriceAction():
 
     def _longBox(self, df):
        
-        trade_range = self.trade_len+7
+        trade_range = self.trade_len+14
         df= df.tail(3000).reset_index(drop=True)
         self.max_index = df[-trade_range:-1]['Close'].idxmax()
         self.min_index = df[-trade_range:-1]['Close'].idxmin()
@@ -171,7 +171,7 @@ class  PriceAction():
         else:
             # sel_level =  '0.382'
             # buy_level =  '0.618'
-            tresh = 0.002
+            tresh = 0.0005
         fib_levels = self._calculateFib(min_, max_ )
         
         
@@ -206,7 +206,7 @@ class  PriceAction():
 
         self.percentage = (max_-min_)/min_*100
 
-        if self.trade_len >7 and self.percentage>0.89:          
+        if self.trade_len >7 and self.percentage>0.55:          
              
             self._longBox(df)    
         else:

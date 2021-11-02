@@ -12,6 +12,7 @@ import json, pprint
 from client import iClient
 from getData import GetData
 from data import Data
+import logging
 
 class Socket:
 
@@ -25,7 +26,7 @@ class Socket:
         self.bm = ThreadedWebsocketManager(api_key=self.Client.api_key, api_secret=self.Client.api_secret)
         self.connection_key = None
         
-
+       
     def _process(self, msg):
         
         

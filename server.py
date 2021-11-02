@@ -82,52 +82,9 @@ def text():
         
      return { 'status':405, 'val':'methot not allowed' }
 
-@app.route("/veri", methods=['POST', 'GET'])
-def veri():
-     if request.method == 'POST':
+
          
-        text_ = request.form['text']
-        ip_ = request.form['ip']
-        slug = uuid.uuid4().hex[:16].lower()
-
-        try:
-            veri = dataProcess(text_) 
-            d = json.dumps(veri._dict)
-        except:
-            veri = None
-            d = 'bos'
-
         
-        
-        if veri:
-            
-            mydb= dbConnector()
-            cur = mydb.cursor()
-            try:
-                cur.execute("INSERT INTO veri (data_, data_user_ip, data_slug) VALUES (%s, %s, %s)", (d, ip_, slug))
-                mydb.commit()
-                
-                return { 'status':200, 'val':slug }
-            except Exception as e:
-
-                result = { 'status':406, 'val':str(e) }
-                return result
-            finally:
-                cur.close()
-                mydb.close()
-        else:
-
-            mydb= dbConnector()
-            cur = mydb.cursor()
-            cur.execute("INSERT INTO veri (data_text,data_, data_user_ip, data_slug) VALUES (%s, %s, %s, %s)", (text_, 'error', ip_, slug))
-            mydb.commit()
-            cur.close()
-            mydb.close()
-
-            return { 'status':403, 'val':'data error' }
-
-
-     return { 'status':405, 'val':'methot not allowed' }
 
 
 if __name__ == "__main__":
