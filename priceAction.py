@@ -65,7 +65,7 @@ class  PriceAction():
             self.signal = None
 
         self.trend = 2    
-        if self._miMaxRatio(df, self.check_len)<0.21:
+        if self._miMaxRatio(df, self.check_len)<0.55:
               self.trend = None
         
 
@@ -104,7 +104,7 @@ class  PriceAction():
            
 
             # self.sell_point =             
-             self.stop_price = max(data['Close']-atr[-1]*1,df[-3:-1]['Close'].min())
+             self.stop_price = max(data['Close']-atr[-1]*1.5,df[-3:-1]['Close'].min())
              
              row['open_position'] = 'OPEN_LONG'
              row['position'] = 'OPEN_LONG'
@@ -117,7 +117,7 @@ class  PriceAction():
              self.entry_index = df.tail(1).index[-1]
              self.trade_len=1         
             
-             self.stop_price =min(data['Close']+atr[-1]*1 ,df[-3:-1]['Close'].max())            
+             self.stop_price =min(data['Close']+atr[-1]*1.5 ,df[-3:-1]['Close'].max())            
             # self.buy_point =df[-5:-1]['Open'].max()
               
              row['open_position'] = 'OPEN_SHORT'
