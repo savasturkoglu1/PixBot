@@ -75,9 +75,9 @@ class Strategy:
         self.bot_type = 'PACTION' #'PACTION' # 'INDICATOR', 
         # if self.coin == 'XRPUSDT':
         #     self.bot_type = 'INDICATOR'
-        # if self.bot_type == 'INDICATOR':
-        #     self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
-        #     self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
+        if self.bot_type == 'INDICATOR':
+             self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
+             self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
     def _process(self, live ,df_1m, df_5m, df_15m, df_30m, df_1h, candle_close):
 
         ## set data frames
@@ -103,9 +103,9 @@ class Strategy:
         if self.position is None:
            self.PA.long_flag = False
            self.PA.short_flag = False
-           self.trade_len = 0
-           self.entry_point =None               
-           self.entry_index = None  
+           self.PA.trade_len = 0
+           self.PA.entry_point =None               
+           self.PA.entry_index = None  
         ## get signal
         print(self.candle_close)
         if self.candle_close:

@@ -45,8 +45,8 @@ class Strategy:
         self.Logs = Logs()
 
         ### sources
-        self.rafined = None#pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
-        self.strategies =None#pd.read_csv(base_path+'/source/strategies.csv')
+        self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
+        self.strategies =pd.read_csv(base_path+'/source/strategies.csv')
         
 
         ## data framse        

@@ -65,7 +65,7 @@ class  PriceAction():
             self.signal = None
 
         self.trend = 2    
-        if self._miMaxRatio(df, self.check_len)<0.55:
+        if self._miMaxRatio(df, self.check_len)<0.34:
               self.trend = None
         
 
@@ -92,7 +92,7 @@ class  PriceAction():
         if  self.long_flag is True or self.short_flag is True:
                     self.trade_len +=1
         if self.long_flag is False and self.short_flag is False:
-                self.entry_index = None
+                  self.entry_index = None
 
         if self.signal == 1 and self.trend in [1,2] and self.long_flag is False:
              row['open_long'] = data['Close']
@@ -197,7 +197,7 @@ class  PriceAction():
 
         trade_ratio = np.abs(self.entry_point-df.iloc[-2].Close)/self.entry_point*100 if self.entry_point is not None else 5
         df= df.tail(3000).reset_index(drop=True)
-        trade_range = max(self.trade_len+3, 7)
+        trade_range = max(self.trade_len+3, 5)
         
         self.max_index = df[-trade_range:-1]['Close'].idxmax()
         self.min_index = df[-trade_range:-1]['Close'].idxmin()
@@ -214,7 +214,7 @@ class  PriceAction():
                 r =1  if  self._candleType(df.iloc[self.max_index-1]) == 'BULL' else 2 
                 
                 if self.trade_len>5 or self.sell_point is None :
-                   self.sell_point = min(df.iloc[self.max_index-r].Open, df.iloc[self.max_index-r].Close)
+                   self.sell_point = min(df.iloc[self.max_index-r].Open, df.iloc[self.max_index-r].Close)*(1-0.0003)
                 
                 self.buy_point  = max_ 
                 self.stop_price = max_
@@ -222,7 +222,7 @@ class  PriceAction():
                 r =1  if  self._candleType(df.iloc[self.max_index-1]) == 'BEAR' else 2 
                 
                 if self.trade_len>5 or self.buy_point is None:
-                  self.buy_point = max(df.iloc[self.min_index-r].Open, df.iloc[self.min_index-r].Close)
+                  self.buy_point = max(df.iloc[self.min_index-r].Open, df.iloc[self.min_index-r].Close)*(1+0.0003)
                 self.sell_point  = min_ 
                 self.stop_price = min_
 
