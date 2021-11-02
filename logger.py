@@ -12,8 +12,8 @@ class Logs():
     def __init__(self):
         
         self.logday ='2021-10-16'
-        self.logger=logging.getLogger() 
-        self.logger.setLevel(logging.DEBUG)
+        self.logger=logging.getLogger()
+        self.logger.setLevel(logging.INFO)
         self._setLogger()
         #logging.getLogger('client').disabled
 
