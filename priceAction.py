@@ -152,7 +152,7 @@ class  PriceAction():
 
     def _longBox(self, df):
        
-        trade_range = self.trade_len+14
+        trade_range = self.trade_len+8
         df= df.tail(3000).reset_index(drop=True)
         self.max_index = df[-trade_range:-1]['Close'].idxmax()
         self.min_index = df[-trade_range:-1]['Close'].idxmin()
@@ -208,7 +208,7 @@ class  PriceAction():
 
         self.percentage = (max_-min_)/min_*100
 
-        if self.trade_len >7 and self.percentage>0.55:          
+        if self.trade_len >7 and self.percentage>2.33:          
              
             self._longBox(df)    
         else:
@@ -216,7 +216,7 @@ class  PriceAction():
                 r =1  if  self._candleType(df.iloc[self.max_index-1]) == 'BULL' else 2 
                 
                 if self.trade_len>5 or self.sell_point is None :
-                   self.sell_point = min(df.iloc[self.max_index-r].Open, df.iloc[self.max_index-r].Close)*(1-0.0003)
+                   self.sell_point = min(df.iloc[self.max_index-r].Open, df.iloc[self.max_index-r].Close)*(1-0.0005)
                 
                 self.buy_point  = max_ 
                 self.stop_price = max_
@@ -224,7 +224,7 @@ class  PriceAction():
                 r =1  if  self._candleType(df.iloc[self.max_index-1]) == 'BEAR' else 2 
                 
                 if self.trade_len>5 or self.buy_point is None:
-                  self.buy_point = max(df.iloc[self.min_index-r].Open, df.iloc[self.min_index-r].Close)*(1+0.0003)
+                  self.buy_point = max(df.iloc[self.min_index-r].Open, df.iloc[self.min_index-r].Close)*(1+0.0005)
                 self.sell_point  = min_ 
                 self.stop_price = min_
 
