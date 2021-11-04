@@ -175,9 +175,9 @@ class Trade:
         self._checkBalance()
         
         self._setLeverage(int(kwargs['leverage']))
-
+        self.takeProfit = kwargs['take_profit']
         self.quantity =round(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])   
-        self.profiQuantity = round(self.quantity/2 ,self.prc[self.symbol])   
+        self.profiQuantity = self.quantity if kwargs['take_profit'] is not None else round(self.quantity/2 ,self.prc[self.symbol])   
         self.tradePrice = kwargs['price']
         self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
         ## set stop   
@@ -229,7 +229,8 @@ class Trade:
 
     def _takeProfit(self):
        
-        return
+        if self.takeProfit is False:
+            return
         if  self.takeProfitStatus is True:
             return
         if self.position is None:
@@ -251,6 +252,7 @@ class Trade:
                     self.profitOrderId = order['orderId']
                     self.takeProfitStatus = True
                     self.profitOrder  = order 
+                self.Logs._writeLog('profit order success   '+ str(order))  
             except BinanceAPIException as e:
                  self.Logs._writeLog('order error  '+ str(e))  
 
@@ -347,10 +349,13 @@ class Trade:
 
         if order['status'] == 'FILLED':
            
-           self.quantity = self.quantity-self.profiQuantity
-           self.stopLimit = self.tradePrice
-           self._cancelOrder(self.stopOrder)
-           self._setStop() #'TRAILING_STOP_MARKET'
+            self.quantity = self.quantity-self.profiQuantity
+            self.stopLimit = self.tradePrice
+            if self.quantity>0:
+                self._cancelOrder(self.stopOrder)
+                self._setStop() #'TRAILING_STOP_MARKET'
+            else:
+                self._clearTrade()
     def _checkStop(self):
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.stopOrderId)
 

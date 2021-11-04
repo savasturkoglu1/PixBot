@@ -132,14 +132,14 @@ class  PriceAction():
 
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(data['Close']-self.stop_price)/data['Close']*100            
-           self.leverage  =   max(min(np.ceil(0.89/self.stop_limit) ,5),2)
+           self.leverage  =   max(min(np.ceil(0.89/self.stop_limit) ,7),2)
 
            take_profit = None
-           if   False: # 
+           if   True: # 
                 if self.long_flag is True:
-                     take_profit = (1+self.stop_limit/100*3)*data['Close']
+                     take_profit = (1+self.stop_limit/100*1.89)*data['Close']
                 if self.short_flag is True:
-                     take_profit =(1-self.stop_limit/100*3)*data['Close']
+                     take_profit =(1-self.stop_limit/100*1.89)*data['Close']
            row['leverage'] = self.leverage
            row['stop_limit'] = self.stop_limit
            row['stop_price'] = self.stop_price*(1.0005) if self.short_flag is True else self.stop_price*(1-0.0005)
