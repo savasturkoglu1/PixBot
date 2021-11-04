@@ -175,7 +175,7 @@ class Trade:
         self._checkBalance()
         
         self._setLeverage(int(kwargs['leverage']))
-        self.takeProfit = kwargs['take_profit']
+        self.takeProfit =True if kwargs['take_profit'] is not None else False
         self.quantity =round(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])   
         self.profiQuantity = self.quantity if kwargs['take_profit'] is not None else round(self.quantity/2 ,self.prc[self.symbol])   
         self.tradePrice = kwargs['price']

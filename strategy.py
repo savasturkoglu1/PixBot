@@ -165,7 +165,8 @@ class Strategy:
                 stop_price =round(self.signals['stop_price'], self.prc[self.coin]),
                 stop_limit =round(self.signals['stop_limit'],3),
                 profit_price=round(self.signals['take_profit'], self.prc[self.coin]) if self.signals['take_profit'] is not None else None,
-                leverage=self.signals['leverage']
+                leverage=self.signals['leverage'],
+                take_profit = self.signals['take_profit']
             )
         
         return params
