@@ -283,12 +283,13 @@ class Trade:
         self.profitLimit = 0
         self.profitPrice = None
         self.stopPrice = None
+        self.leverage =5
        # self._cancelOrder(self.stopOrder)
        
 
     def _setLeverage(self, leverage):
         self.leverage = leverage
-        self.client.futures_change_leverage(symbol=self.symbol, leverage=leverage)
+        self.client.futures_change_leverage(symbol=self.symbol, leverage=self.leverage)
 
     #''' check current usdt balance '''
     def _checkBalance(self):
