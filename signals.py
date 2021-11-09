@@ -69,7 +69,7 @@ class Signals:
         ## trend
         
         if kwargs['trend_type'] == 'EMA':            
-            if data['kairi_ema']>0.2 :
+            if data['kairi_ema']>0.34 :
                     if data['trend_long']>data['trend_short']:
                         self.trend=0
                     if  data['trend_short']> data['trend_long']:
@@ -200,17 +200,13 @@ class Signals:
             self._pMax(data, **kwargs)
 
         if kwargs['strategy'] == 'TILLSON':
-            if self.till_prev is None:
-                self.till_prev = data['till']
-                self.main_signal = None
-            else:
-               
-                if data['till']>self.till_prev and self.signal_filter in [1,2]:
-                    self.main_signal =1
-                    
-                if data['till']< self.till_prev and self.signal_filter in [0,2]:
-                    self.main_signal = 0 
-                self.till_prev = data['till'] 
+            
+            if data['till']>self.till_prev and self.signal_filter in [1,2]:
+                self.main_signal =1
+                
+            if data['till']< self.till_prev and self.signal_filter in [0,2]:
+                self.main_signal = 0 
+            self.till_prev = data['till'] 
 
         ##price filter 
         ## decision
@@ -224,7 +220,7 @@ class Signals:
                 #print(mark,'time:',datetime.utcfromtimestamp(int(data['Time']//1000)).strftime("%Y-%m-%d %H:%M"), {k: v for k, v in kwargs.items() if v==v}, 'long')
                 
 
-        if self.trend in [0,2] and self.main_signal ==0 and   self.short_flag is False and self.long_flag is False:
+        elif self.trend in [0,2] and self.main_signal ==0 and   self.short_flag is False and self.long_flag is False:
            # if self._priceFilter(data, **kwargs) is True:
                 self.short_flag = True
                 self.row['open_short'] = close
@@ -232,12 +228,12 @@ class Signals:
                 self._tradeStrategy(data,**kwargs)
                 #print(mark,'time:',datetime.utcfromtimestamp(int(data['Time']//1000)).strftime("%Y-%m-%d %H:%M"), {k: v for k, v in kwargs.items() if v==v}, 'short')
             
-        if self.main_signal == 0  and self.long_flag is True:
+        elif self.main_signal == 0  and self.long_flag is True:
             self.long_flag = False 
             self.row['close_long'] =  close 
             self.row['position'] = 'CLOSE_LONG' 
  
-        if self.main_signal == 1  and self.short_flag is True:
+        elif self.main_signal == 1  and self.short_flag is True:
             
             self.short_flag = False
             self.row['close_short'] =  close
@@ -258,15 +254,15 @@ class Signals:
 
         if True: #kwargs['stop_indicator'] == 'atr':
             if self.long_flag is True:
-                self.stop_price = data['Close']-1*data['atr']
+                self.stop_price = data['Close']-1.44*data['atr']
             if self.short_flag is True:
-                self.stop_price = data['Close']+1*data['atr']
+                self.stop_price = data['Close']+1.44*data['atr']
             #print(data['atr'], self.stop_price)
 
         if kwargs['stop_indicator'] != 'solid':
             self.stop_limit = np.abs(data['Close']-self.stop_price)/data['Close']*100
             
-            self.leverage  =max(min(np.ceil(2/self.stop_limit) ,6),2)
+            self.leverage  =max(min(np.ceil(0.89/self.stop_limit) ,10),2)
           
             
         else:
@@ -280,11 +276,11 @@ class Signals:
             self.trailing_stop = self.stop_limit
         else:
             self.trailing_stop = None
-        if  True: #kwargs['take_profit']  is 
+        if  kwargs['take_profit']  is True:
             if self.long_flag is True:
-                self.take_profit = (1+self.stop_limit/100*2.5)*data['Close']
+                self.take_profit = (1+self.stop_limit/100*3)*data['Close']
             if self.short_flag is True:
-                self.take_profit = (1-self.stop_limit/100*2.5)*data['Close']
+                self.take_profit = (1-self.stop_limit/100*2)*data['Close']
         else:
             self.take_profit = None
        # self.dec = len(str(data['Close']).split('.')[1])

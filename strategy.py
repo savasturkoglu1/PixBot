@@ -72,12 +72,12 @@ class Strategy:
         self.trade_signal = None
         self.trade_count = None
         self.trade_perm = False
-        self.bot_type = 'PACTION' #'PACTION' # 'INDICATOR', 
+        self.bot_type = 'INDICATOR' #'PACTION' # 'INDICATOR', 
         # if self.coin == 'XRPUSDT':
         #     self.bot_type = 'INDICATOR'
-        if self.bot_type == 'INDICATOR':
-             self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
-             self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
+        # if self.bot_type == 'INDICATOR':
+        #      self.rafined = pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
+        #      self.strategies = pd.read_csv(base_path+'/source/strategies.csv')
     def _process(self, live ,df_1m, df_5m, df_15m, df_30m, df_1h, candle_close):
 
         ## set data frames
@@ -89,13 +89,63 @@ class Strategy:
         self.live  = live
         self.candle_close = candle_close
 
-        self.Trade._live(live)
+        #self.Trade._live(live)
         if self.bot_type=='PACTION':
                self._priceActionSignals()
         if self.bot_type=='INDICATOR':
                self._indicatorSignal()
         
-    
+    def _indicatorSignal(self):
+        self.Trade._live(self.live)
+        # self._getMarket()
+        # self._getStrategy()
+        self.params = {'Unnamed: 0': 58338,
+                'atr_len': np.nan,
+                'ema_len': np.nan,
+                'ema_length': np.nan,
+                'filter_period': 'DYN',
+                'ma_len': np.nan,
+                'ma_type': np.nan,
+                'macd_ma_type': 'EMA',
+                'macd_period': '[8, 34, 8]',
+                'macd_src_type': 'EMA',
+                'macd_type': 'soft',
+                'multipiler': np.nan,
+                'pmax_ma_type': np.nan,
+                'price_filter': False,
+                'signal_filter': 'ROC',
+                'stop_indicator': 'atr',
+                'strategy': 'MACD',
+                'take_profit': True,
+                'till': np.nan,
+                'time_frame': '5m',
+                'trailing_stop': False,
+                'trend_period': 144,
+                'trend_type': 'EMA',
+                'unique': 'S6HEYQEX' }
+
+        
+
+        self.df = self.df_5m
+        
+            
+        
+
+        self.position = self.Trade.position
+        if self.position is None:
+           self.Signal.long_flag = False
+           self.Signal.short_flag = False
+        
+        params = None
+        if self.candle_close is True:    
+           self.signals =  self.Signal._getSignal(self.df, self.params)
+           params = self._tradeParamsInd()
+        
+        
+        print(self.coin,self.signals, params)
+        if  params is not None  : 
+           self.Logs._writeLog(self.coin+'-ind order params   '+ str(params)+'\n'+str(self.params))   
+           self.Trade._order(**params)
     def _priceActionSignals(self):
         ## check trade position
         self.Trade._live(self.live)
@@ -144,7 +194,31 @@ class Strategy:
                         self.close = False
                         
                     self.Trade._order(**params)  
-
+    
+    def _tradeParamsInd(self):
+        params=None
+        if self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT':
+            params=dict(
+                order_type=self.signals['position'],
+                trade_type='LONG' if self.signals['position'] == 'CLOSE_LONG' else 'SHORT',
+                price=self.signals['close_long'] if self.signals['close_position'] == 'CLOSE_LONG' else self.signals['close_short'],
+                
+            )
+        elif self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
+            p = self.signals['open_long'] if self.signals['position'] == 'OPEN_LONG' else self.signals['open_short']
+            params=dict(
+                order_type=self.signals['position'],
+                trade_type='LONG' if self.signals['position'] == 'OPEN_LONG' else 'SHORT',
+                price=round(p, self.prc[self.coin]),
+                stop_price =round(self.signals['stop_price'], self.prc[self.coin]),
+                stop_limit =round(self.signals['stop_limit'],3),
+                profit_price=round(self.signals['take_profit'], self.prc[self.coin]) if self.signals['take_profit'] is not None else None,
+                leverage=self.signals['leverage'],
+                take_profit = self.signals['take_profit']
+            )
+        
+        return params
+    
     def _tradeParams(self):
         params=None
         if self.signals['close_position'] is not None :

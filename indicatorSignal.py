@@ -137,26 +137,51 @@ class Strategy:
                 self.Trade._order(**params)  
     def _indicatorSignal(self):
         self.Trade._live(self.live)
-        self._getMarket()
-        self._getStrategy()
+        # self._getMarket()
+        # self._getStrategy()
+        self.params = {'Unnamed: 0': 58338,
+            'atr_len': np.nan,
+            'ema_len': np.nan,
+            'ema_length': np.nan,
+            'filter_period': 'DYN',
+            'ma_len': np.nan,
+            'ma_type': np.nan,
+            'macd_ma_type': 'EMA',
+            'macd_period': '[8, 34, 8]',
+            'macd_src_type': 'EMA',
+            'macd_type': 'soft',
+            'multipiler': np.nan,
+            'pmax_ma_type': np.nan,
+            'price_filter': False,
+            'signal_filter': 'ROC',
+            'stop_indicator': 'atr',
+            'strategy': 'MACD',
+            'take_profit': False,
+            'till': np.nan,
+            'time_frame': '5m',
+            'trailing_stop': False,
+            'trend_period': 144,
+            'trend_type': 'EMA',
+            'unique': 'S6HEYQEX'}
 
-        if self.params['time_frame'] == '30m':
-            self.df = self.df_30m
-            self.intval = self.intval*30
-        elif self.params['time_frame'] == '1h':
-            self.df = self.df_1h
-            self.intval = self.intval*60
-        elif self.params['time_frame'] == '5m':
-            self.df = self.df_5m
-            self.intval = self.intval*5
-        else:
-            self.df = self.df_15m 
-            self.intval = self.intval*15
+        # if self.params['time_frame'] == '30m':
+        #     self.df = self.df_30m
+        #     self.intval = self.intval*30
+        # elif self.params['time_frame'] == '1h':
+        #     self.df = self.df_1h
+        #     self.intval = self.intval*60
+        # elif self.params['time_frame'] == '5m':
+        #     self.df = self.df_5m
+        #     self.intval = self.intval*5
+        # else:
+        #     self.df = self.df_15m 
+        #     self.intval = self.intval*15
 
         self.df = self.df_5m
         
             
-       
+        
+
         self.position = self.Trade.position
         if self.position is None:
            self.Signal.long_flag = False
@@ -170,26 +195,22 @@ class Strategy:
         if  params is not None  : 
            self.Logs._writeLog(self.coin+'- order params   '+ str(params)+'\n'+str(self.params))   
            self.Trade._order(**params)
-           self.trade_perm = False
-           self.trade_count = None
-           self.trade_signal = None
+           
 
     def _tradeParams(self):
         params=None
-        if self.signals['close_position'] is not None :
-            #self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT'
+        if self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT':
             params=dict(
-                order_type=self.signals['close_position'],
-                trade_type='LONG' if self.signals['close_position'] == 'CLOSE_LONG' else 'SHORT',
+                order_type=self.signals['position'],
+                trade_type='LONG' if self.signals['position'] == 'CLOSE_LONG' else 'SHORT',
                 price=self.signals['close_long'] if self.signals['close_position'] == 'CLOSE_LONG' else self.signals['close_short'],
                 
             )
-        elif self.signals['open_position'] is not None:
-        #self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
+        elif self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
             p = self.signals['open_long'] if self.signals['open_position'] == 'OPEN_LONG' else self.signals['open_short']
             params=dict(
-                order_type=self.signals['open_position'],
-                trade_type='LONG' if self.signals['open_position'] == 'OPEN_LONG' else 'SHORT',
+                order_type=self.signals['position'],
+                trade_type='LONG' if self.signals['position'] == 'OPEN_LONG' else 'SHORT',
                 price=round(p, self.prc[self.coin]),
                 stop_price =round(self.signals['stop_price'], self.prc[self.coin]),
                 stop_limit =round(self.signals['stop_limit'],3),
