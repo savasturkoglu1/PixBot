@@ -201,7 +201,7 @@ class Strategy:
             params=dict(
                 order_type=self.signals['position'],
                 trade_type='LONG' if self.signals['position'] == 'CLOSE_LONG' else 'SHORT',
-                price=self.signals['close_long'] if self.signals['close_position'] == 'CLOSE_LONG' else self.signals['close_short'],
+                price=self.signals['close_long'] if self.signals['position'] == 'CLOSE_LONG' else self.signals['close_short'],
                 
             )
         elif self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
