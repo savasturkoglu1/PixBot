@@ -113,7 +113,7 @@ class Strategy:
                 'multipiler': np.nan,
                 'pmax_ma_type': np.nan,
                 'price_filter': False,
-                'signal_filter': 'ROC',
+                'signal_filter': 'CCI',
                 'stop_indicator': 'atr',
                 'strategy': 'MACD',
                 'take_profit': True,
