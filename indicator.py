@@ -98,7 +98,7 @@ class Indicator:
             data['adx_pos'] = adx.adx_pos()
         if kwargs['signal_filter'] == 'CCI':
             data['cci']=talib.CCI(df.High, df.Low, df.Close,
-            timeperiod=filter_period if kwargs['filter_period'] == 'DYN' else 13)
+            timeperiod=filter_period if kwargs['filter_period'] == 'DYN' else 21)
             
         if kwargs['signal_filter'] == 'PPO':
             data['ppo'] = talib.PPO(df.Close,
