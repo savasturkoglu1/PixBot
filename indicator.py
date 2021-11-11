@@ -107,7 +107,7 @@ class Indicator:
         if kwargs['signal_filter'] == 'ROC':
             data['roc'] = talib.ROC(df.Close,timeperiod=filter_period if kwargs['filter_period'] == 'DYN' else 13 )
         if kwargs['signal_filter'] == 'RSI':
-            data['rsi'] = talib.RSI(df.Close,timeperiod=filter_period if kwargs['filter_period'] == 'DYN' else 5)
+            data['rsi'] = talib.RSI(df.Close,timeperiod=filter_period if kwargs['filter_period'] == 'DYN' else 13)
      
         
         

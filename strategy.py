@@ -113,7 +113,7 @@ class Strategy:
                 'multipiler': np.nan,
                 'pmax_ma_type': np.nan,
                 'price_filter': False,
-                'signal_filter': 'RSI',
+                'signal_filter': 'CCI',
                 'stop_indicator': 'atr',
                 'strategy': 'MACD',
                 'take_profit': True,
@@ -121,7 +121,7 @@ class Strategy:
                 'time_frame': '5m',
                 'trailing_stop': False,
                 'trend_period': 144,
-                'trend_type': 'EMA',
+                'trend_type': 'FALSE',
                 'unique': 'S6HEYQEX' }
 
         

@@ -137,6 +137,15 @@ class Signals:
                     self.signal_filter =0  
             else:
                 self.signal_filter = None
+        elif kwargs['signal_filter'] == 'CCI':
+            
+            if  data['cci']>50:
+                    
+                    self.signal_filter=1
+            elif  data['cci']<-50:
+                    self.signal_filter =0  
+            else:
+                self.signal_filter = None
         elif kwargs['signal_filter'] == 'RSI':
         
             if  data['rsi']>60:
@@ -254,15 +263,15 @@ class Signals:
 
         if True: #kwargs['stop_indicator'] == 'atr':
             if self.long_flag is True:
-                self.stop_price = max(data['Close']-2*data['atr'], data['Close']*0.99)
+                self.stop_price = max(data['Close']-2*data['atr'], data['Close']*0.985)
             if self.short_flag is True:
-                self.stop_price = min(data['Close']+2*data['atr'], data['Close']*1.01) 
+                self.stop_price = min(data['Close']+2*data['atr'], data['Close']*1.015) 
             #print(data['atr'], self.stop_price)
 
         if kwargs['stop_indicator'] != 'solid':
             self.stop_limit = np.abs(data['Close']-self.stop_price)/data['Close']*100
             
-            self.leverage  =max(min(np.ceil(2/self.stop_limit) ,10),3)
+            self.leverage  =max(min(np.ceil(1.44/self.stop_limit) ,10),3)
           
             
         else:
