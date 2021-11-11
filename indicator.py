@@ -46,7 +46,7 @@ class Indicator:
             if kwargs['macd_src_type'] == 'DEMA':
                 macd_src = talib.DEMA(df.Close, timeperiod=8)
             elif kwargs['macd_src_type'] == 'EMA':
-                    macd_src = talib.EMA(df.Close, timeperiod=5)
+                    macd_src = talib.EMA(df.Close, timeperiod=8)
             elif kwargs['macd_src_type'] == 'TEMA':
                 macd_src = talib.TEMA(df.Close, timeperiod=8)
             elif kwargs['macd_src_type'] == 'KAMA':
