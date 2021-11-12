@@ -101,8 +101,7 @@ class Signals:
         #                 self.trend = 1
         if data['adx_trend'] >30:
                self.trend = 2
-        if data['kairi_ema']<0.25 :
-            self.trend = None
+       
    
 
         ## signal filter
