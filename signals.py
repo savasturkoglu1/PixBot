@@ -26,6 +26,7 @@ class Signals:
         ## flasgs
         self.long_flag = False
         self.short_flag = False
+        self.clear_trade = False
 
         # trade params
         self.stop_limit = 2
@@ -146,6 +147,12 @@ class Signals:
                     self.signal_filter =0  
             else:
                 self.signal_filter = None
+            
+            # if self.long_flag is True or self.short_flag is True:
+            #     if self.clear_trade is True:
+            #         if -50<data['cci'] and data['cci']<50:
+            #             self.long_flag = False
+            #             self.short_flag = False
         elif kwargs['signal_filter'] == 'RSI':
         
             if  data['rsi']>60:
@@ -263,9 +270,9 @@ class Signals:
 
         if True: #kwargs['stop_indicator'] == 'atr':
             if self.long_flag is True:
-                self.stop_price = max(data['Close']-2*data['atr'], data['Close']*0.985)
+                self.stop_price = max(data['Close']-2*data['atr'], data['Close']*0.99)
             if self.short_flag is True:
-                self.stop_price = min(data['Close']+2*data['atr'], data['Close']*1.015) 
+                self.stop_price = min(data['Close']+2*data['atr'], data['Close']*1.01) 
             #print(data['atr'], self.stop_price)
 
         if kwargs['stop_indicator'] != 'solid':

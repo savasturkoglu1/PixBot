@@ -132,9 +132,10 @@ class Strategy:
         
 
         self.position = self.Trade.position
-       # if self.position is None:
-        #    self.Signal.long_flag = False
-        #    self.Signal.short_flag = False
+        if self.position is None:
+           self.Signal.clear_trade = True
+        else:
+            self.Signal.clear_trade = True
         
         
         params = None

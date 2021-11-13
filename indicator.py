@@ -24,7 +24,7 @@ class Indicator:
                 'bb_upper':bb_upper,
                 'bb_lower':bb_lower,
                 'sma_20': basis,
-                'atr':talib.ATR(df.High, df.Low, df.Close, timeperiod=14),
+                'atr':talib.ATR(df.High, df.Low, df.Close, timeperiod=5),
                 'adx_trend':talib.ADX(df.High, df.Low, df.Close, timeperiod=14)
         }
 
