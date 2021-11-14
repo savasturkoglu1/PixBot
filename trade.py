@@ -346,18 +346,24 @@ class Trade:
         
        
     def _checkProfit(self):
+        return
         self.Logs._writeLog('profit order  '+ str(self.profitOrderId)) 
-        order = self.client.futures_get_order(symbol=self.symbol,orderId=self.profitOrderId)
-        self.Logs._writeLog('profit order  '+ str(order)) 
-        if order['status'] == 'FILLED':
-           
-            self.quantity = self.quantity-self.profiQuantity
-            self.stopLimit = self.tradePrice
-            if self.quantity>0:
-                self._cancelOrder(self.stopOrder)
-                self._setStop() #'TRAILING_STOP_MARKET'
-            else:
-                self._clearTrade()
+
+        try:
+            order = self.client.futures_get_order(symbol=self.symbol,orderId=self.profitOrderId)
+            self.Logs._writeLog('profit order  '+ str(order)) 
+            if order['status'] == 'FILLED':
+            
+                self.quantity = self.quantity-self.profiQuantity
+                self.stopLimit = self.tradePrice
+                self.takeProfitStatus = False
+                if self.quantity>0:
+                    self._cancelOrder(self.stopOrder)
+                    self._setStop() #'TRAILING_STOP_MARKET'
+                else:
+                    self._clearTrade()
+        except BinanceAPIException as e:
+                 self.Logs._writeLog('order error  '+ str(e))  
     def _checkStop(self):
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.stopOrderId)
 
