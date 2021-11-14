@@ -135,7 +135,7 @@ class Strategy:
         if self.position is None:
            self.Signal.clear_trade = True
         else:
-            self.Signal.clear_trade = True
+            self.Signal.clear_trade = False
         
         
         params = None
