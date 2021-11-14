@@ -316,11 +316,11 @@ class Trade:
                      self._cancelOrder(self.profitOrder)
                 self._clearTrade()
             if order['type'] == 'STOP':
-                self.stopOrderId = 0
+                self.stopOrderId = None
                 self.setStopStatus = False 
                 self.stopOrder  = None
             if order['type'] == 'TAKE_PROFİT':
-                self.profitOrderId = 0
+                self.profitOrderId = None
                 self.takeProfitStatus = False 
                 self.profitOrder  = None
 
@@ -346,8 +346,9 @@ class Trade:
         
        
     def _checkProfit(self):
+        self.Logs._writeLog('profit order  '+ str(self.profitOrderId)) 
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.profitOrderId)
-
+        self.Logs._writeLog('profit order  '+ str(order)) 
         if order['status'] == 'FILLED':
            
             self.quantity = self.quantity-self.profiQuantity

@@ -12,7 +12,7 @@ import json, pprint
 from client import iClient
 from getData import GetData
 from data import Data
-import logging
+
 
 class Socket:
 

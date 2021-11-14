@@ -278,7 +278,7 @@ class Signals:
         if kwargs['stop_indicator'] != 'solid':
             self.stop_limit = np.abs(data['Close']-self.stop_price)/data['Close']*100
             
-            self.leverage  =max(min(np.ceil(1.44/self.stop_limit) ,10),3)
+            self.leverage  =max(min(np.ceil(1.89/self.stop_limit) ,10),3)
           
             
         else:
