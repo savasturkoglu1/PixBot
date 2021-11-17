@@ -73,13 +73,14 @@ class Trade:
     def _live(self, data):
        # print(self.symbol, self.position, self.quantity)
         if self.order is not  None:
-            self._checkPosition()
-            if self.orderStatus !='FILLED':
-                self._checkOrder()
+            
+            # if self.orderStatus !='FILLED':
+            #     self._checkOrder()
             if self.setStopStatus is False:
                 self._setStop()
             if self.takeProfitStatus is False:
                 self._takeProfit()
+            self._checkPosition()
             # if self.takeProfitStatus is True:
             #     self._checkProfit()
             # if self.setStopStatus is True:
