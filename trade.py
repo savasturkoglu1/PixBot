@@ -328,20 +328,21 @@ class Trade:
 
    # ''' check position of current coin '''
     def _checkPosition(self):
-        try:
-            p = self.client.futures_position_information(symbol=self.symbol)
-            
-            if  float(p[0]['positionAmt']) < 0:
-                self.position =0
-                self.quantity = np.abs(float(p[0]['positionAmt']))
-            elif float(p[0]['positionAmt']) >0 :
-                self.position =1 
-                self.quantity = np.abs(float(p[0]['positionAmt']))     
-            else:
-                self.position = None
-                self._clearTrade()
-        except BinanceAPIException as e:
-                 self.Logs._writeLog('order error  '+ str(e))
+        
+        p = self.client.futures_position_information(symbol=self.symbol)
+        
+        if  float(p[0]['positionAmt']) < 0:
+            self.position =0
+            self.quantity = np.abs(float(p[0]['positionAmt']))
+        elif float(p[0]['positionAmt']) >0 :
+            self.position =1 
+            self.quantity = np.abs(float(p[0]['positionAmt']))     
+        else:
+            self.position = None
+            self._clearTrade()
+        # try:
+        # except BinanceAPIException as e:
+        #          self.Logs._writeLog('order error  '+ str(e))
  
             
 
