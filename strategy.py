@@ -109,7 +109,7 @@ class Strategy:
                 'ma_len': np.nan,
                 'ma_type': np.nan,
                 'macd_ma_type': 'EMA',
-                'macd_period': '[5, 13, 8]',
+                'macd_period': '[8, 13, 8]',
                 'macd_src_type': 'EMA',
                 'macd_type': 'soft',
                 'multipiler': np.nan,
