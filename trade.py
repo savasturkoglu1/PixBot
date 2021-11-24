@@ -7,6 +7,7 @@ from binance.exceptions import BinanceAPIException
 import time
 import json
 from logger import Logs
+import math
 
 class Trade:
     def __init__(self,client, coin):
@@ -179,7 +180,8 @@ class Trade:
         
         self._setLeverage(int(kwargs['leverage']))
         self.takeProfit =True if kwargs['take_profit'] is not None else False
-        self.quantity =round(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])   
+        self.quantity =math.floor(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])
+        #round(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])   
         self.profiQuantity = self.quantity if kwargs['take_profit'] is not None else round(self.quantity/2 ,self.prc[self.symbol])   
         self.tradePrice = kwargs['price']
         self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
