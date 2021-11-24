@@ -26,6 +26,7 @@ class Strategy:
             'ETHUSDT':1.2,
             'DOTUSDT':2.02,
             'ADAUSDT':1.42,
+             'AVAXUSDT':2,
             'XRPUSDT':1.2
         }
 
@@ -33,6 +34,7 @@ class Strategy:
             'BTCUSDT':0,
             'ETHUSDT':2,
             'DOTUSDT':2,
+            'AVAXUSDT':2,
             'ADAUSDT':3,
             'XRPUSDT':4
         }
@@ -107,7 +109,7 @@ class Strategy:
                 'ma_len': np.nan,
                 'ma_type': np.nan,
                 'macd_ma_type': 'EMA',
-                'macd_period': '[8, 34, 8]',
+                'macd_period': '[5, 13, 8]',
                 'macd_src_type': 'EMA',
                 'macd_type': 'soft',
                 'multipiler': np.nan,
