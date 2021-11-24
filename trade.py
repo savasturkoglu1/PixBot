@@ -63,7 +63,7 @@ class Trade:
             'BTCUSDT':3,
             'ETHUSDT':3,
             'DOTUSDT':1,
-            'AVAXUSDT':1,
+            'AVAXUSDT':0,
             'ADAUSDT':2,
             'XRPUSDT':1
         }
