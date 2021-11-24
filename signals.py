@@ -270,9 +270,9 @@ class Signals:
 
         if True: #kwargs['stop_indicator'] == 'atr':
             if self.long_flag is True:
-                self.stop_price = max(data['Close']-2*data['atr'], data['Close']*0.99)
+                self.stop_price = max(data['Close']-2*data['atr'], data['Close']*0.98)
             if self.short_flag is True:
-                self.stop_price = min(data['Close']+2*data['atr'], data['Close']*1.01) 
+                self.stop_price = min(data['Close']+2*data['atr'], data['Close']*1.02) 
             #print(data['atr'], self.stop_price)
 
         if kwargs['stop_indicator'] != 'solid':
