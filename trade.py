@@ -180,7 +180,7 @@ class Trade:
         
         self._setLeverage(int(kwargs['leverage']))
         self.takeProfit =True if kwargs['take_profit'] is not None else False
-        self.quantity =math.floor(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])
+        self.quantity =math.floor(self.tradeMargin/kwargs['price']*self.leverage)
         #round(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])   
         self.profiQuantity = self.quantity if kwargs['take_profit'] is not None else round(self.quantity/2 ,self.prc[self.symbol])   
         self.tradePrice = kwargs['price']
@@ -331,21 +331,21 @@ class Trade:
 
    # ''' check position of current coin '''
     def _checkPosition(self):
-        
-        p = self.client.futures_position_information(symbol=self.symbol)
-        
-        if  float(p[0]['positionAmt']) < 0:
-            self.position =0
-            self.quantity = np.abs(float(p[0]['positionAmt']))
-        elif float(p[0]['positionAmt']) >0 :
-            self.position =1 
-            self.quantity = np.abs(float(p[0]['positionAmt']))     
-        else:
-            self.position = None
-            self._clearTrade()
-        # try:
-        # except BinanceAPIException as e:
-        #          self.Logs._writeLog('order error  '+ str(e))
+        try:
+            p = self.client.futures_position_information(symbol=self.symbol)
+            
+            if  float(p[0]['positionAmt']) < 0:
+                self.position =0
+                self.quantity = np.abs(float(p[0]['positionAmt']))
+            elif float(p[0]['positionAmt']) >0 :
+                self.position =1 
+                self.quantity = np.abs(float(p[0]['positionAmt']))     
+            else:
+                self.position = None
+                self._clearTrade()
+            
+        except BinanceAPIException as e:
+                 self.Logs._writeLog('order error  '+ str(e))
  
             
 
