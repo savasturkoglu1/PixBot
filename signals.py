@@ -226,7 +226,15 @@ class Signals:
 
         ##price filter 
         ## decision
-
+        
+        if self.main_signal == 1:
+            if data['Open'] > data['Close']:
+                self.main_signal = None
+        if self.main_signal == 0:
+            if data['Open'] < data['Close']:
+                self.main_signal = None
+           
+            
         if  self.trend in [1,2]  and self.main_signal==1  and self.long_flag is False and self.short_flag is False :
            # if self._priceFilter(data, **kwargs) is True:
                 self.long_flag = True                

@@ -159,7 +159,8 @@ class Trade:
                 if True:#order['status'] == 'FILLED':
                                             
                             self._setStop()
-                            self._takeProfit() 
+                            if self.takeProfit is True:
+                               self._takeProfit() 
                 else :
                     self._checkOrder()         
             else:
