@@ -147,7 +147,7 @@ class Trade:
        
 
     def _placeOrder(self,order_type,params):
-        self.Logs._writeLog('place order with :'+ str(self.symbol,params))
+        self.Logs._writeLog('place order with :'+ str(self.symbol)+str(self.symbol))
         try:
             order = self.client.futures_create_order(**params)
             if order_type == 'OPEN_LONG' or order_type == 'OPEN_SHORT':   
