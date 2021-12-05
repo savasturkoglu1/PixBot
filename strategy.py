@@ -118,7 +118,7 @@ class Strategy:
                 'signal_filter': 'CCI',
                 'stop_indicator': 'atr',
                 'strategy': 'MACD',
-                'take_profit': True,
+                'take_profit': False,
                 'till': np.nan,
                 'time_frame': '5m',
                 'trailing_stop': False,

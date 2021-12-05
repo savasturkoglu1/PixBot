@@ -69,6 +69,7 @@ if __name__ == '__main__':
    
     
     from client import iClient
-    coin = 'ETHUSDT'
-    d = GetData(iClient().client,coin)
-    d._getData()
+    coins = ['BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT',
+    for i in coins:
+        d = GetData(iClient().client,i)
+        d._getData()
