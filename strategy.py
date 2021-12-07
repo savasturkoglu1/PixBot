@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from signals import Signals
 from priceAction import PriceAction
+from cspSignal import CspSignal
 from trade import Trade
 from logger import Logs
 class Strategy:
@@ -35,9 +36,10 @@ class Strategy:
             'ETHUSDT':2,
             'DOTUSDT':2,
             'AVAXUSDT':2,
-            'ADAUSDT':3,
+            'ADAUSDT':0,
             'XRPUSDT':4
         }
+        
 
         ## objects
         self.Indicator = Indicator()
@@ -45,6 +47,7 @@ class Strategy:
         self.PA = PriceAction()
         self.Trade = Trade(self.client, self.coin)
         self.Logs = Logs()
+        self.CSP = CspSignal()
 
         ### sources
         self.rafined = None#pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
@@ -92,11 +95,33 @@ class Strategy:
         self.candle_close = candle_close
 
         #self.Trade._live(live)
-        if self.bot_type=='PACTION':
-               self._priceActionSignals()
-        if self.bot_type=='INDICATOR':
-               self._indicatorSignal()
+        # if self.bot_type=='PACTION':
+        #        self._priceActionSignals()
+        # if self.bot_type=='INDICATOR':
+        #        self._indicatorSignal()
+        self._cspSignal()
+    def _cspSignal(self):
+        self.Trade._live(self.live)
+        self.df = self.df_5m       
+            
         
+
+        self.position = self.Trade.position
+        if self.position is None:
+            self.CSP.long_flag = False
+            self.CSP.short_flag = False
+        
+        
+        params = None
+        if self.candle_close is True:    
+           self.signals =  self.CSP._signal(self.df[-500:])
+           params = self._tradeParams()
+        
+        
+        print(self.coin,self.signals, params)
+        if  params is not None  : 
+           self.Logs._writeLog(self.coin+'-ind order params   '+ str(params)+'\n'+str(self.params))   
+           self.Trade._order(**params)
     def _indicatorSignal(self):
         self.Trade._live(self.live)
         # self._getMarket()
@@ -143,7 +168,7 @@ class Strategy:
         params = None
         if self.candle_close is True:    
            self.signals =  self.Signal._getSignal(self.df, self.params)
-           params = self._tradeParamsInd()
+           params = self._tradeParams()
         
         
         print(self.coin,self.signals, params)
@@ -199,7 +224,7 @@ class Strategy:
                         
                     self.Trade._order(**params)  
     
-    def _tradeParamsInd(self):
+    def _tradeParams(self):
         params=None
         if self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT':
             params=dict(
@@ -223,7 +248,7 @@ class Strategy:
         
         return params
     
-    def _tradeParams(self):
+    def _tradeParamsPa(self):
         params=None
         if self.signals['close_position'] is not None :
             #self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT'

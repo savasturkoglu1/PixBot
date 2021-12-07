@@ -17,7 +17,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.80
+        self.marginRate = 0.45
         self.stopRate = 2
         self.profitRate = 7
         
@@ -65,7 +65,7 @@ class Trade:
             'ETHUSDT':3,
             'DOTUSDT':1,
             'AVAXUSDT':0,
-            'ADAUSDT':2,
+            'ADAUSDT':0,
             'XRPUSDT':1
         }
     
@@ -183,7 +183,7 @@ class Trade:
         self.takeProfit =True if kwargs['take_profit'] is not None else False
         self.quantity =round(self.tradeMargin/kwargs['price']*self.leverage,self.prc[self.symbol])   
 
-        #math.floor(self.tradeMargin/kwargs['price']*self.leverage)
+       
         self.profiQuantity = self.quantity if kwargs['take_profit'] is not None else round(self.quantity/2 ,self.prc[self.symbol])   
         self.tradePrice = kwargs['price']
         self.side = 'BUY' if kwargs['trade_type']== 'LONG' else  'SELL' 
