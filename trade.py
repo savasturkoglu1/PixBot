@@ -66,7 +66,8 @@ class Trade:
             'DOTUSDT':1,
             'AVAXUSDT':0,
             'ADAUSDT':0,
-            'XRPUSDT':1
+            'XRPUSDT':1,
+            'ATOMUSDT':2
         }
     
 

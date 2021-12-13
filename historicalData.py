@@ -12,7 +12,7 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=1200, look_back_short=1):
+    def __init__(self, client,coin,look_back=1500, look_back_short=1):
 
         self.client = client
         self.coin   = coin
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     c = ['XRPUSDT', 'XLMUSDT', 
 'LINKUSDT', 'LTCUSDT','CHZUSDT','BNBUSDT','BCHUSDT','VETUSDT','XTZUSDT', 'DASHUSDT','HOTUSDT',
 'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT','AVAXUSDT', 'FILUSDT','BTCUSDT','ETHUSDT'] 
-    coins = ['XRPUSDT', 'BNBUSDT', 'LTCUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT', #'BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT', 'DOTUSDT','XRPUSDT'
-    for i in coins:
+    coins = ['DOTUSDT', 'ADAUSDT', 'ETHUSDT', 'BTCUSDT','XRPUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT', #'BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT', 'DOTUSDT','XRPUSDT'
+    for i in ['XLMUSDT', 'ATOMUSDT', 'LINKUSDT', 'ETCUSDT']:
         d = GetData(iClient().client,i)
         d._getData()

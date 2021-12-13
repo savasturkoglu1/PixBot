@@ -37,7 +37,8 @@ class Strategy:
             'DOTUSDT':2,
             'AVAXUSDT':2,
             'ADAUSDT':0,
-            'XRPUSDT':4
+            'XRPUSDT':4,
+            'ATOMUSDT':3
         }
         
 
@@ -47,7 +48,7 @@ class Strategy:
         self.PA = PriceAction()
         self.Trade = Trade(self.client, self.coin)
         self.Logs = Logs()
-        self.CSP = CspSignal()
+        self.CSP = CspSignal(self.coin)
 
         ### sources
         self.rafined = None#pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
