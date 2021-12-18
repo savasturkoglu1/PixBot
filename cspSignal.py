@@ -1,11 +1,11 @@
 
 import xgboost as xgb
 
-import pickle
+
 import pandas as pd 
 import numpy as np
 from datetime import datetime
-import mplfinance as mpf
+
 import talib
 class CspSignal:
     
