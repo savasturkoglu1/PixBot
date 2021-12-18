@@ -5,14 +5,14 @@ import xgboost as xgb
 import pandas as pd 
 import numpy as np
 from datetime import datetime
-
+from env import base_path 
 import talib
 class CspSignal:
     
     def __init__(self, coin):
         
        # self.model_path = "/home/savas/Desktop/BotDev/backtest/data/xgb_ETHUSDT.model"
-        self.model_path = "/home/savas/Desktop/PixBot/source/model/"+coin+".model"
+        self.model_path = base_path+"/source/model/"+coin+".model"
         self.model = None
         
         self.cols = ['stick_body_ratio', 'candle_length_perc',
