@@ -26,6 +26,8 @@ class CspSignal:
         self.stop_limit = None
         self.stop_price = None
         self.leverage = None
+        self.sell_point =None
+        self.buy_point = None
         
 
        
@@ -39,7 +41,33 @@ class CspSignal:
         model = xgb.XGBClassifier({'nthread':4})
         model.load_model(self.model_path)
         self.model = model
-   
+    def _boxData(self, df):
+        row=[]
+        max_ = df.High.max()
+        min_ = df.Low.min()
+        d  = df.to_dict('records')
+        ratio = max_-min_ 
+        
+        for i in range(0, 3):
+            row.append((d[i]['Low']-min_)/ratio )
+            row.append((d[i]['Open']-min_)/ratio )
+            row.append((d[i]['Close']-min_)/ratio )
+            row.append((d[i]['High']-min_)/ratio )
+            row.append( np.abs(d[i]['Open']-d[i]['Close']) / (d[i]['High']-d[i]['Low'])  )
+
+            ###
+
+            
+            if d[i]['Open']>d[i]['Close']:
+                dr = -1
+            elif d[i]['Open']<d[i]['Close']:
+                dr = 1
+            else:
+                dr =0
+            row.append(dr)
+        
+
+        return row
     def _candle(self,df):
         data=[]
     
@@ -60,7 +88,7 @@ class CspSignal:
                         row['body_from_top'] =  np.abs(row['Close']-row['High'])/row['Close']
                         row['body_from_bottom'] =  np.abs(row['Open']-row['Low'])/row['Open']
                 else:
-                        row['body_from_top'] =  np.abs(row['Open']-row['High'])/row['High']
+                        row['body_from_top'] =  np.abs(row['Open']-row['High'])/row['Open']
                         row['body_from_bottom'] =  np.abs(row['Low']-row['Close'])/row['Close']
                 data.append(row)
         return pd.DataFrame.from_dict(data)
@@ -78,16 +106,25 @@ class CspSignal:
         'close_short':np.nan,'stop_price':np.nan, 'trailing_stop':np.nan,
                 'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan}
         
-        a = np.array(df[self.cols][-4:-1])
-        a = a.ravel()
-        p = self.model.predict_proba([a])
+        p = self.model.predict_proba([self._boxData(df[-3:])])
         p = p.tolist()[0]
  
-        if p[0]>0.87 and data['Close']<data['Open']:
-            self.signal = 0
-        elif p[1]>0.87 and data['Close']>data['Open']:
+        if p[0]>0.63 :
+            self.sell_point = close
+            self.buy_point = None
+        elif p[1]>0.64 :
+            self.sell_point = None
+            self.buy_point = close
+        
+        if self.buy_point is not None and close >self.buy_point:
             self.signal = 1
-        else:
+            self.sell_point = None
+            self.buy_point = None
+        elif self.sell_point is not None and close<self.sell_point:
+            self.signal = 0
+            self.sell_point = None
+            self.buy_point = None
+        else :
             self.signal = None
 
 
@@ -131,13 +168,13 @@ class CspSignal:
                 # if self.short_flag is True:
                 #      take_profit =(1-.02)*data['Close'] #(1-self.stop_limit/100*3)*data['Close']
                 if self.long_flag is True:
-                     take_profit = (1+self.stop_limit/100*2)*data['Close']
+                     take_profit = (1+self.stop_limit/100*5)*data['Close']
                 if self.short_flag is True:
-                     take_profit =(1-self.stop_limit/100*2)*data['Close']
+                     take_profit =(1-self.stop_limit/100*5)*data['Close']
            row['leverage'] = self.leverage
            row['stop_limit'] = self.stop_limit
            row['trailing_stop'] = False
            row['stop_price'] = self.stop_price #*(1.001) if self.short_flag is True else self.stop_price*(1-0.001)
-           row['take_profit'] = None
+           row['take_profit'] = take_profit
                    
         return row
