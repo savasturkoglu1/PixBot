@@ -7,6 +7,8 @@ import numpy as np
 from signals import Signals
 from priceAction import PriceAction
 from cspSignal import CspSignal
+
+from candleSignal import CandleSignal
 from trade import Trade
 from logger import Logs
 class Strategy:
@@ -21,15 +23,7 @@ class Strategy:
 
 
 
-        ## defaults
-        self.atr_tresh = {
-            'BTCUSDT':0.96,
-            'ETHUSDT':1.2,
-            'DOTUSDT':2.02,
-            'ADAUSDT':1.42,
-             'AVAXUSDT':2,
-            'XRPUSDT':1.2
-        }
+        
 
         self.prc = {
             'BTCUSDT':0,
@@ -38,7 +32,9 @@ class Strategy:
             'AVAXUSDT':2,
             'ADAUSDT':0,
             'XRPUSDT':4,
-            'ATOMUSDT':3
+            'ATOMUSDT':3,
+            'LINKUSDT':2,
+            'XLMUSDT':4
         }
         
 
@@ -48,8 +44,8 @@ class Strategy:
         self.PA = PriceAction()
         self.Trade = Trade(self.client, self.coin)
         self.Logs = Logs()
-        self.CSP = CspSignal(self.coin)
-
+      #  self.CSP = CspSignal(self.coin)
+        self.Candle  = CandleSignal()
         ### sources
         self.rafined = None#pd.read_csv(base_path+'/source/rafine_ocmarket_'+self.coin+'.csv')
         self.strategies =None#pd.read_csv(base_path+'/source/strategies.csv')
@@ -100,7 +96,29 @@ class Strategy:
         #        self._priceActionSignals()
         # if self.bot_type=='INDICATOR':
         #        self._indicatorSignal()
-        self._cspSignal()
+        self._candleSignal()
+    def _candleSignal(self):
+            self.Trade._live(self.live)
+            self.df = self.df_1m       
+                
+            
+
+            self.position = self.Trade.position
+            if self.position is None:
+                self.Candle.long_flag = False
+                self.Candle.short_flag = False
+            
+            
+            params = None
+              
+            self.signals =  self.Candle._signal(self.df[-1000:])
+            params = self._tradeParams()
+            
+            
+            print(self.coin,self.signals, params)
+            if  params is not None  : 
+                self.Logs._writeLog(self.coin+'-ind order params   '+ str(params)+'\n'+str(self.params))   
+                self.Trade._order(**params)    
     def _cspSignal(self):
         self.Trade._live(self.live)
         self.df = self.df_5m       

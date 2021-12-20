@@ -17,7 +17,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.90
+        self.marginRate = 0.45
         self.stopRate = 2
         self.profitRate = 7
         
@@ -67,7 +67,9 @@ class Trade:
             'AVAXUSDT':0,
             'ADAUSDT':0,
             'XRPUSDT':1,
-            'ATOMUSDT':2
+            'ATOMUSDT':2,
+            'LINKUSDT':2,
+            'XLMUSDT':0
         }
     
 
