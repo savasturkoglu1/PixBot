@@ -10,9 +10,9 @@ class CandleSignal:
         self.short_flag = False
         self.long_flag = False
         self.signal = None
-        self.candle_names = None
+        
        
-        self.candle_names = None
+        self.candle_names = talib.get_function_groups()['Pattern Recognition']
         self.candle_rankings = {
                     "CDL3LINESTRIKE_Bull": 1,
                     "CDL3LINESTRIKE_Bear": 2,
@@ -127,8 +127,129 @@ class CandleSignal:
                     "CDLDOJI_Bull": 104,
                     "CDLDOJI_Bear": 104
                 }
-
-        self._candleName()
+        self.long_ranks = {'CDLABANDONEDBABY': 1,
+                        'CDLCONCEALBABYSWALL': 2,
+                        'CDLTASUKIGAP': 3,
+                        'CDLLADDERBOTTOM': 4,
+                        'CDLCOUNTERATTACK': 5,
+                        'CDL3WHITESOLDIERS': 6,
+                        'CDLTRISTAR': 7,
+                        'CDLUNIQUE3RIVER': 8,
+                        'CDLHOMINGPIGEON': 9,
+                        'CDLGAPSIDESIDEWHITE': 10,
+                        'CDLMATHOLD': 11,
+                        'CDLSTICKSANDWICH': 12,
+                        'CDLXSIDEGAP3METHODS': 13,
+                        'CDLMORNINGSTAR': 14,
+                        'CDLHAMMER': 15,
+                        'CDLHIKKAKE': 16,
+                        'CDLSEPARATINGLINES': 17,
+                        'CDLLONGLINE': 18,
+                        'CDLHARAMI': 19,
+                        'CDLGRAVESTONEDOJI': 20,
+                        'CDLBELTHOLD': 21,
+                        'CDL3OUTSIDE': 22,
+                        'CDLMATCHINGLOW': 23,
+                        'CDLHARAMICROSS': 24,
+                        'CDLDOJISTAR': 25,
+                        'CDLMARUBOZU': 26,
+                        'CDLPIERCING': 27,
+                        'CDLSHORTLINE': 28,
+                        'CDLSPINNINGTOP': 29,
+                        'CDL3INSIDE': 30,
+                        'CDLDOJI': 31,
+                        'CDLLONGLEGGEDDOJI': 32,
+                        'CDLHIKKAKEMOD': 33,
+                        'CDLCLOSINGMARUBOZU': 34,
+                        'CDLRICKSHAWMAN': 35,
+                        'CDLENGULFING': 36,
+                        'CDLINVERTEDHAMMER': 37,
+                        'CDLHIGHWAVE': 38,
+                        'CDLDRAGONFLYDOJI': 39,
+                        'CDLTAKURI': 40,
+                        'CDLMORNINGDOJISTAR': 41,
+                        'CDL3LINESTRIKE': 42,
+                        'CDLRISEFALL3METHODS': 43,
+                        'CDLEVENINGSTAR': 44,
+                        'CDLUPSIDEGAP2CROWS': 45,
+                        'CDLTHRUSTING': 46,
+                        'CDL3STARSINSOUTH': 47,
+                        'CDLSTALLEDPATTERN': 48,
+                        'CDLEVENINGDOJISTAR': 49,
+                        'CDLKICKING': 50,
+                        'CDLSHOOTINGSTAR': 51,
+                        'CDLBREAKAWAY': 52,
+                        'CDLKICKINGBYLENGTH': 53,
+                        'CDLHANGINGMAN': 54,
+                        'CDLONNECK': 55,
+                        'CDLADVANCEBLOCK': 56,
+                        'CDL3BLACKCROWS': 57,
+                        'CDLIDENTICAL3CROWS': 58,
+                        'CDLINNECK': 59,
+                        'CDLDARKCLOUDCOVER': 60,
+                        'CDL2CROWS': 61}
+        self.short_ranks = {'CDL3BLACKCROWS': 1,
+                        'CDLTASUKIGAP': 2,
+                        'CDLEVENINGDOJISTAR': 3,
+                        'CDLEVENINGSTAR': 4,
+                        'CDLIDENTICAL3CROWS': 5,
+                        'CDL3INSIDE': 6,
+                        'CDLTHRUSTING': 7,
+                        'CDLHIKKAKEMOD': 8,
+                        'CDLDARKCLOUDCOVER': 9,
+                        'CDLADVANCEBLOCK': 10,
+                        'CDLHARAMICROSS': 11,
+                        'CDLSPINNINGTOP': 12,
+                        'CDLBREAKAWAY': 13,
+                        'CDLRISEFALL3METHODS': 14,
+                        'CDLENGULFING': 15,
+                        'CDLSHOOTINGSTAR': 16,
+                        'CDLHIGHWAVE': 17,
+                        'CDLSHORTLINE': 18,
+                        'CDLDOJISTAR': 19,
+                        'CDLHANGINGMAN': 20,
+                        'CDLBELTHOLD': 21,
+                        'CDLHARAMI': 22,
+                        'CDLLONGLINE': 23,
+                        'CDL3OUTSIDE': 24,
+                        'CDLHIKKAKE': 25,
+                        'CDLMARUBOZU': 26,
+                        'CDLSEPARATINGLINES': 27,
+                        'CDLCLOSINGMARUBOZU': 28,
+                        'CDLSTALLEDPATTERN': 29,
+                        'CDL3LINESTRIKE': 30,
+                        'CDL2CROWS': 31,
+                        'CDLGAPSIDESIDEWHITE': 32,
+                        'CDLXSIDEGAP3METHODS': 33,
+                        'CDLINNECK': 34,
+                        'CDLCOUNTERATTACK': 35,
+                        'CDLONNECK': 36,
+                        'CDLTRISTAR': 37,
+                        'CDLUPSIDEGAP2CROWS': 38,
+                        'CDLINVERTEDHAMMER': 39,
+                        'CDLDRAGONFLYDOJI': 40,
+                        'CDLUNIQUE3RIVER': 41,
+                        'CDL3STARSINSOUTH': 42,
+                        'CDL3WHITESOLDIERS': 43,
+                        'CDLTAKURI': 44,
+                        'CDLSTICKSANDWICH': 45,
+                        'CDLABANDONEDBABY': 46,
+                        'CDLCONCEALBABYSWALL': 47,
+                        'CDLDOJI': 48,
+                        'CDLGRAVESTONEDOJI': 49,
+                        'CDLKICKING': 50,
+                        'CDLRICKSHAWMAN': 51,
+                        'CDLPIERCING': 52,
+                        'CDLMORNINGSTAR': 53,
+                        'CDLMORNINGDOJISTAR': 54,
+                        'CDLMATHOLD': 55,
+                        'CDLMATCHINGLOW': 56,
+                        'CDLHAMMER': 57,
+                        'CDLLONGLEGGEDDOJI': 58,
+                        'CDLLADDERBOTTOM': 59,
+                        'CDLKICKINGBYLENGTH': 60,
+                        'CDLHOMINGPIGEON': 61}
+        #self._candleName()
 
     def _candlestick(self,df):
         
@@ -155,10 +276,10 @@ class CandleSignal:
 
         for key,val in row.items():
                 if val >0:
-                    ranks.append(self.candle_rankings[key+'_Bull'])
+                    ranks.append(self.long_ranks[key])
                     pattern_val.append(val)
                 if val <0:
-                    ranks.append(self.candle_rankings[key+'_Bear'])
+                    ranks.append(self.short_ranks[key])
                     pattern_val.append(val)
         if len(pattern_val)>0:
                 if np.all(np.array(pattern_val)>0):
@@ -187,7 +308,9 @@ class CandleSignal:
         self.candle_names = [candle for candle in candle_names if candle not in exclude_items]
        
 
-    def _signal(self,df):
+    def _signal(self,df, df_5m):
+        rsi = talib.RSI(df_5m.Close, timeperiod=14)
+        atr =  talib.ATR(df.High, df.Low, df.Close, timeperiod=14).tolist()  
         df = self._candlestick(df)
         data = df.iloc[-1].to_dict()
         close = df.iloc[-1].Close
@@ -201,14 +324,20 @@ class CandleSignal:
      
         trade, rank,match = self._pattern_signal(df[self.candle_names].iloc[-2].to_dict())
         
-        if trade ==1 and rank<40 and data['Close']>data['Open']:
+        if trade ==1 and rank<40 and match>1 and data['Close']>data['Open']:
             self.signal =1
-        elif trade == 0 and rank<50 and  data['Close']<data['Open']:
+        elif trade == 0 and rank<40 and match>1 and  data['Close']<data['Open']:
             self.signal = 0
         else:
             self.signal = None
 
-
+        signal_filter =None
+        if list(rsi)[-1]>50:
+            signal_filter =1
+        elif list(rsi)[-1]<50:
+            signal_filter =0
+        # if list(atr)[-1]>48:
+        #     signal_filter = 2
 
         if self.signal == 1 and self.short_flag is True:
             row['close_short'] = close
@@ -220,28 +349,28 @@ class CandleSignal:
             row['position'] = 'CLOSE_LONG'
             self.long_flag = False    
 
-        elif self.signal == 1  and self.long_flag is False:# and data['rsi']>50:
+        elif self.signal == 1  and self.long_flag is False and signal_filter in [1,2]:
              row['open_long'] = close
              row['position'] = 'OPEN_LONG'
              self.long_flag = True           
                          
-             self.stop_price =   df[['Close','Open']].iloc[-2:].values.min()
-             #close-2*atr          
+             self.stop_price =   df[['Close','Open']].iloc[-3:].values.min()
+             #close-3*atr          
              
-        elif self.signal ==0   and  self.short_flag is False:# and data['rsi']<50:
+        elif self.signal ==0   and  self.short_flag is False and signal_filter in [0,2]:
              row['position'] = 'OPEN_SHORT'
              row['open_short'] = close
              self.short_flag = True         
                     
             
-             self.stop_price =  df[['Close','Open']].iloc[-2:].values.max()#close+2*atr
+             self.stop_price =  df[['Close','Open']].iloc[-3:].values.max()
             
              
        
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
-           self.leverage  = max(min(np.ceil(1/self.stop_limit) ,13),2)
+           self.leverage  = max(min(np.ceil(0.89/self.stop_limit) ,8),2)
            
            take_profit = None
            if   True: # 

@@ -111,7 +111,7 @@ class Strategy:
             
             params = None
               
-            self.signals =  self.Candle._signal(self.df[-1000:])
+            self.signals =  self.Candle._signal(self.df[-1000:], self.df_5m)
             params = self._tradeParams()
             
             

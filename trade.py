@@ -17,7 +17,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.45
+        self.marginRate = 0.98
         self.stopRate = 2
         self.profitRate = 7
         
