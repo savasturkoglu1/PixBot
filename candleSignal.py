@@ -331,11 +331,11 @@ class CandleSignal:
         else:
             self.signal = None
 
-        signal_filter =None
-        if list(rsi)[-1]>50:
-            signal_filter =1
-        elif list(rsi)[-1]<50:
-            signal_filter =0
+        signal_filter =2
+        # if list(rsi)[-1]>50:
+        #     signal_filter =1
+        # elif list(rsi)[-1]<50:
+        #     signal_filter =0
         # if list(atr)[-1]>48:
         #     signal_filter = 2
 
@@ -354,7 +354,7 @@ class CandleSignal:
              row['position'] = 'OPEN_LONG'
              self.long_flag = True           
                          
-             self.stop_price =   df[['Close','Open']].iloc[-3:].values.min()
+             self.stop_price =   df[['Close','Open']].iloc[-2:].values.min()*(1-.002)
              #close-3*atr          
              
         elif self.signal ==0   and  self.short_flag is False and signal_filter in [0,2]:
@@ -363,14 +363,14 @@ class CandleSignal:
              self.short_flag = True         
                     
             
-             self.stop_price =  df[['Close','Open']].iloc[-3:].values.max()
+             self.stop_price =  df[['Close','Open']].iloc[-2:].values.max()*1.002
             
              
        
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
-           self.leverage  = max(min(np.ceil(0.89/self.stop_limit) ,8),2)
+           self.leverage  = max(min(np.ceil(1/self.stop_limit) ,10),2)
            
            take_profit = None
            if   True: # 
