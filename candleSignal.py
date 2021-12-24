@@ -324,7 +324,7 @@ class CandleSignal:
      
         trade, rank,match = self._pattern_signal(df[self.candle_names].iloc[-2].to_dict())
         
-        if trade ==1 and rank<38 and match>1 and data['Close']>data['Open']:
+        if trade ==1 and rank<38 and match>2 and data['Close']>data['Open']:
             self.signal =1
         elif trade == 0 and rank<40 and match>1 and  data['Close']<data['Open']:
             self.signal = 0
