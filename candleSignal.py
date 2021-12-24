@@ -324,18 +324,18 @@ class CandleSignal:
      
         trade, rank,match = self._pattern_signal(df[self.candle_names].iloc[-2].to_dict())
         
-        if trade ==1 and rank<40 and match>1 and data['Close']>data['Open']:
+        if trade ==1 and rank<38 and match>1 and data['Close']>data['Open']:
             self.signal =1
         elif trade == 0 and rank<40 and match>1 and  data['Close']<data['Open']:
             self.signal = 0
         else:
             self.signal = None
 
-        signal_filter =2
-        # if list(rsi)[-1]>50:
-        #     signal_filter =1
-        # elif list(rsi)[-1]<50:
-        #     signal_filter =0
+        signal_filter =None
+        if list(rsi)[-1]>50:
+            signal_filter =1
+        elif list(rsi)[-1]<50:
+            signal_filter =0
         # if list(atr)[-1]>48:
         #     signal_filter = 2
 
@@ -370,7 +370,7 @@ class CandleSignal:
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
-           self.leverage  = max(min(np.ceil(1/self.stop_limit) ,10),2)
+           self.leverage  = max(min(np.ceil(1.44/self.stop_limit) ,13),3)
            
            take_profit = None
            if   True: # 
