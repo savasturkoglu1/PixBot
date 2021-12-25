@@ -117,7 +117,7 @@ class Strategy:
             
             print(self.coin,self.signals, params)
             if  params is not None  : 
-                self.Logs._writeLog(self.coin+'-ind order params   '+ str(params)+'\n'+str(self.params))   
+                self.Logs._writeLog(self.coin+'-csp order params   '+ str(params)+'\n'+str(self.params))   
                 self.Trade._order(**params)    
     def _cspSignal(self):
         self.Trade._live(self.live)
