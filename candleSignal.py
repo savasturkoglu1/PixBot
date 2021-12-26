@@ -362,22 +362,22 @@ class CandleSignal:
             signal_filter =1
         elif list(rsi)[-1]<43:
             signal_filter =0
-        if list(rsi)[-1]>1.1 or list(rsi)[-1]< -1.07:
+        if list(rsi)[-1]>1.21 or list(rsi)[-1]< -1.1:
             signal_filter = 2
 
-        if self.signal == 1 and self.short_flag is True  and self.trade_len >2:
+        if self.signal == 1 and self.short_flag is True  and self.trade_len >3:
             row['close_short'] = close
             row['position'] = 'CLOSE_SHORT'
             self.short_flag = False 
             self.trade_len = None
 
-        elif self.signal==0 and self.long_flag is True  and self.trade_len >2:
+        elif self.signal==0 and self.long_flag is True  and self.trade_len >3:
             row['close_long'] = close
             row['position'] = 'CLOSE_LONG'
             self.long_flag = False 
             self.trade_len = None 
 
-        elif self.signal == 1  and self.long_flag is False and signal_filter in [1,2]:
+        elif self.signal == 1  and self.long_flag is False and  self.short_flag is False and signal_filter in [1,2]:
              row['open_long'] = close
              row['position'] = 'OPEN_LONG'
              self.long_flag = True   
@@ -386,7 +386,7 @@ class CandleSignal:
              self.stop_price =   df[['Close','Open']].iloc[-2:].values.min()*(1-.001)
              #close-3*atr          
              
-        elif self.signal ==0   and  self.short_flag is False and signal_filter in [0,2]:
+        elif self.signal ==0   and  self.short_flag is False  and self.long_flag is False  and signal_filter in [0,2]:
              row['position'] = 'OPEN_SHORT'
              row['open_short'] = close
              self.short_flag = True  
