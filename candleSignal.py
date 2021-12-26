@@ -307,10 +307,18 @@ class CandleSignal:
 
         self.candle_names = [candle for candle in candle_names if candle not in exclude_items]
        
+    def _kairi(self, src, length):
+        
+        trend_long = talib.EMA(src, 144)
+        trend_short = talib.EMA(src, 55)
+     
 
+        return 100 * (trend_short - trend_long)/trend_long
     def _signal(self,df, df_5m):
         rsi = talib.RSI(df_5m.Close, timeperiod=14)
-        atr =  talib.ATR(df.High, df.Low, df.Close, timeperiod=14).tolist()  
+        atr =  talib.ATR(df.High, df.Low, df.Close, timeperiod=14).tolist()
+        kairi = self._kairi(df.Close,144)
+
         df = self._candlestick(df)
         data = df.iloc[-1].to_dict()
         close = df.iloc[-1].Close
@@ -331,39 +339,39 @@ class CandleSignal:
         # else:
         #     self.signal = None
         if trade ==1 and rank<37 and match>2 :# and data['Close']>=data['Open']:
-                if self.short_flag is False and self.long_flag is False:
-                    if data['Close']>=data['Open']:
-                       self.signal =1
-                    else:
-                       self.signal = None
-                else:
+                # if self.short_flag is False and self.long_flag is False:
+                #     if data['Close']>=data['Open']:
+                #        self.signal =1
+                #     else:
+                #        self.signal = None
+                # else:
                     self.signal =1
         elif trade == 0 and rank<40 and  match>1:# and data['Close']<=data['Open']:
-            if self.short_flag is False and self.long_flag is False:
-                if data['Close']<=data['Open']:
-                  self.signal =0
-                else:
-                  self.signal = None
-            else:
+            # if self.short_flag is False and self.long_flag is False:
+            #     if data['Close']<=data['Open']:
+            #       self.signal =0
+            #     else:
+            #       self.signal = None
+            # else:
                self.signal =0
         else:
             self.signal = None
 
         signal_filter =None
-        if list(rsi)[-1]>50:
+        if list(rsi)[-1]>57:
             signal_filter =1
-        elif list(rsi)[-1]<50:
+        elif list(rsi)[-1]<43:
             signal_filter =0
-        # if list(atr)[-1]>48:
-        #     signal_filter = 2
+        if list(rsi)[-1]>1.2 or list(rsi)[-1]< -1.2:
+            signal_filter = 2
 
-        if self.signal == 1 and self.short_flag is True  and self.trade_len >4:
+        if self.signal == 1 and self.short_flag is True  and self.trade_len >2:
             row['close_short'] = close
             row['position'] = 'CLOSE_SHORT'
             self.short_flag = False 
             self.trade_len = None
 
-        elif self.signal==0 and self.long_flag is True  and self.trade_len >4:
+        elif self.signal==0 and self.long_flag is True  and self.trade_len >2:
             row['close_long'] = close
             row['position'] = 'CLOSE_LONG'
             self.long_flag = False 
