@@ -10,7 +10,7 @@ class CandleSignal:
         self.short_flag = False
         self.long_flag = False
         self.signal = None
-        
+        self.trade_len = None
        
         self.candle_names = talib.get_function_groups()['Pattern Recognition']
         self.candle_rankings = {
@@ -324,10 +324,28 @@ class CandleSignal:
      
         trade, rank,match = self._pattern_signal(df[self.candle_names].iloc[-2].to_dict())
         
-        if trade ==1 and rank<38 and match>2 and data['Close']>data['Open']:
-            self.signal =1
-        elif trade == 0 and rank<40 and match>1 and  data['Close']<data['Open']:
-            self.signal = 0
+        # if trade ==1 and rank<38 and match>2 and data['Close']>data['Open']:
+        #     self.signal =1
+        # elif trade == 0 and rank<40 and match>1 and  data['Close']<data['Open']:
+        #     self.signal = 0
+        # else:
+        #     self.signal = None
+        if trade ==1 and rank<37 and match>2 :# and data['Close']>=data['Open']:
+                if self.short_flag is False and self.long_flag is False:
+                    if data['Close']>=data['Open']:
+                       self.signal =1
+                    else:
+                       self.signal = None
+                else:
+                    self.signal =1
+        elif trade == 0 and rank<40 and  match>1:# and data['Close']<=data['Open']:
+            if self.short_flag is False and self.long_flag is False:
+                if data['Close']<=data['Open']:
+                  self.signal =0
+                else:
+                  self.signal = None
+            else:
+               self.signal =0
         else:
             self.signal = None
 
@@ -339,20 +357,23 @@ class CandleSignal:
         # if list(atr)[-1]>48:
         #     signal_filter = 2
 
-        if self.signal == 1 and self.short_flag is True:
+        if self.signal == 1 and self.short_flag is True  and self.trade_len >4:
             row['close_short'] = close
             row['position'] = 'CLOSE_SHORT'
             self.short_flag = False 
+            self.trade_len = None
 
-        elif self.signal==0 and self.long_flag is True:
+        elif self.signal==0 and self.long_flag is True  and self.trade_len >4:
             row['close_long'] = close
             row['position'] = 'CLOSE_LONG'
-            self.long_flag = False    
+            self.long_flag = False 
+            self.trade_len = None 
 
         elif self.signal == 1  and self.long_flag is False and signal_filter in [1,2]:
              row['open_long'] = close
              row['position'] = 'OPEN_LONG'
-             self.long_flag = True           
+             self.long_flag = True   
+             self.trade_len = 1        
                          
              self.stop_price =   df[['Close','Open']].iloc[-2:].values.min()*(1-.001)
              #close-3*atr          
@@ -360,17 +381,21 @@ class CandleSignal:
         elif self.signal ==0   and  self.short_flag is False and signal_filter in [0,2]:
              row['position'] = 'OPEN_SHORT'
              row['open_short'] = close
-             self.short_flag = True         
+             self.short_flag = True  
+             self.trade_len = 1       
                     
             
              self.stop_price =  df[['Close','Open']].iloc[-2:].values.max()*1.001
+        else:
+            if self.trade_len is not None:
+                  self.trade_len +=1
             
              
        
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
-           self.leverage  = max(min(np.ceil(0.89/self.stop_limit) ,15),3)
+           self.leverage  = max(min(np.ceil(1/self.stop_limit) ,15),3)
            
            take_profit = None
            if   True: # 
