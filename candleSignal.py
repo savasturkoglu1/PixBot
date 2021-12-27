@@ -362,7 +362,8 @@ class CandleSignal:
             signal_filter =1
         elif list(rsi)[-1]<43:
             signal_filter =0
-        if list(rsi)[-1]>1.1 or list(rsi)[-1]< -1.07:
+            
+        if list(kairi)[-1]>1.1 or list(kairi)[-1]< -1.07:
             signal_filter = 2
 
         if self.signal == 1 and self.short_flag is True  and self.trade_len >3:
