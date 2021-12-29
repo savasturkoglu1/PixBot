@@ -8,4 +8,5 @@ class iClient:
         self.api_key = "JKjrsJHkJoCNckrlXBdTjFB01iTszkNXmcqzUOkBj3Z6XROjnINVShqtmicseG58"
         self.api_secret = "YraZCTbi5O1c2RzSbp0La5fZCPNoJR2t0Zl6PD20hBQwfhYKKK7pyiAEBUgs8Ex8"
         self.client = Client(self.api_key, self.api_secret, {"timeout": 20}) #"verify": False, 
+       ## self.client.FUTURES_URL = 'https://dapi.binance.com/dapi'
         

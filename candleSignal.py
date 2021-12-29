@@ -338,7 +338,7 @@ class CandleSignal:
         #     self.signal = 0
         # else:
         #     self.signal = None
-        if trade ==1 and rank<37 and match>2 :# and data['Close']>=data['Open']:
+        if trade ==1 and rank<37 and match>1 :# and data['Close']>=data['Open']:
                 # if self.short_flag is False and self.long_flag is False:
                 #     if data['Close']>=data['Open']:
                 #        self.signal =1
@@ -362,7 +362,7 @@ class CandleSignal:
             signal_filter =1
         elif list(rsi)[-1]<43:
             signal_filter =0
-            
+
         if list(kairi)[-1]>1.1 or list(kairi)[-1]< -1.07:
             signal_filter = 2
 

@@ -24,6 +24,7 @@ class Socket:
         self.GetData = GetData(self.Client.client, self.coin)
 
         self.bm = ThreadedWebsocketManager(api_key=self.Client.api_key, api_secret=self.Client.api_secret)
+        #self.bm.FUTURES_URL = 'wss://fstream.binance.com'
         self.connection_key = None
         
        
@@ -43,7 +44,7 @@ class Socket:
         
         self.bm.start()
         '''  start socket '''
-        self.connection_key =self.bm.start_kline_socket( callback= self._process,symbol=self.coin, interval=Client.KLINE_INTERVAL_1MINUTE) #)
+        self.connection_key =self.bm.start_kline_futures_socket( callback= self._process,symbol=self.coin, interval=Client.KLINE_INTERVAL_1MINUTE) #)
        # self.bm.start()
 
 

@@ -12,7 +12,7 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=2, look_back_short=1):
+    def __init__(self, client,coin,look_back=1, look_back_short=1):
 
         self.client = client
         self.coin   = coin
@@ -58,7 +58,7 @@ class GetData:
             #     back = self.from_date_back_short
             path = self.file_path+self.coin+period+'.csv'
             print(self.coin, self.intervals[period], back)
-            data_ = self.client.get_historical_klines(self.coin, self.intervals[period], back)  
+            data_ = self.client.futures_historical_klines(self.coin, self.intervals[period], back)  
             df = pd.DataFrame(data_)
             
             df =df.rename(columns={0: "Time", 1: "Open", 2:"High", 3:"Low", 4:"Close", 5:"Volum", 6:"CloseTime" }) #7:"Quote" , 8:"TradeNumber", 9:"BaseAsset", 10:"QuoteAsset"

@@ -97,7 +97,7 @@ class Data:
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
-             #self._writeData()
+             self._writeData()
              print( 'time ', time )
 
 
@@ -134,7 +134,7 @@ class Data:
      
 
          self.df_5m.to_csv(base_path+'/data/obs/'+self.coin+'df_5m.csv')
-         self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')
-         self.df_30m.to_csv(base_path+'/data/obs/'+self.coin+'df_30m.csv')
-         self.df_5m.to_csv(base_path+'/data/obs/'+self.coin+'df_5m.csv')
+       #  self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')
+       #  self.df_30m.to_csv(base_path+'/data/obs/'+self.coin+'df_30m.csv')
+         self.df_1m.to_csv(base_path+'/data/obs/'+self.coin+'df_1m.csv')
         
