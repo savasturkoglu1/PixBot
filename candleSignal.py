@@ -314,12 +314,22 @@ class CandleSignal:
      
 
         return 100 * (trend_short - trend_long)/trend_long
-    def _signal(self,df, df_5m):
-        rsi = talib.RSI(df_5m.Close, timeperiod=14)
-        atr =  talib.ATR(df.High, df.Low, df.Close, timeperiod=14).tolist()
-        kairi = self._kairi(df.Close,144)
-
+    def _data(self, df):
         df = self._candlestick(df)
+        df['kairi'] =  self._kairi(df.Close,144)
+        df['TimeH'] = df.Time.apply(lambda x: x//300000)
+        d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
+         'Open':'first', 'Close':'last', 'Volum':'sum'}).reset_index()
+        
+        d['rsi'] = talib.RSI(d.Close, timeperiod=14)
+        df = pd.merge(df, d[['Time','rsi']],how='left',  on=['Time'])    
+        return df
+    def _signal(self,df, df_5m):
+        
+        df = self._data(df)
+        
+
+        
         data = df.iloc[-1].to_dict()
         close = df.iloc[-1].Close
         
@@ -357,13 +367,21 @@ class CandleSignal:
         else:
             self.signal = None
 
-        signal_filter =None
-        if list(rsi)[-1]>57:
-            signal_filter =1
-        elif list(rsi)[-1]<43:
-            signal_filter =0
+        # signal_filter =None
+        # if list(rsi)[-1]>57:
+        #     signal_filter =1
+        # elif list(rsi)[-1]<43:
+        #     signal_filter =0
 
-        if list(kairi)[-1]>1.1 or list(kairi)[-1]< -1.07:
+        # if list(kairi)[-1]>1.1 or list(kairi)[-1]< -1.07:
+        #     signal_filter = 2
+
+        signal_filter =None
+        if data['rsi']>57:
+            signal_filter =1
+        elif data['rsi']<43:
+            signal_filter =0
+        if data['kairi']>1.1 or data['kairi']< -1.07:
             signal_filter = 2
 
         if self.signal == 1 and self.short_flag is True  and self.trade_len >3:

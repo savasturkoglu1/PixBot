@@ -54,9 +54,7 @@ class Data:
         ''' df shortener'''
         if self.df_1m.shape[0]>3500:
             self.df_1m = self.df_1m.tail(self.max_len).copy()  
-            # self.df_15m = self.df_15m.tail(self.max_len).copy()        
-            # self.df_30m = self.df_30m.tail(self.max_len).copy()
-            # self.df_1h = self.df_1h.tail(self.max_len).copy()
+            
         
      
 
