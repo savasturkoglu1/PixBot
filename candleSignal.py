@@ -334,7 +334,7 @@ class CandleSignal:
         close = df.iloc[-1].Close
         
         
-        row ={'Time':data['Time'],'position':np.nan,
+        row ={'Time':data['Time'],'position':np.nan, 
         'open_long':np.nan,'close_long':np.nan,'open_short':np.nan,
         'close_short':np.nan,'stop_price':np.nan, 'trailing_stop':np.nan,
                 'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan}
@@ -377,9 +377,9 @@ class CandleSignal:
         #     signal_filter = 2
 
         signal_filter =None
-        if data['rsi']>57:
+        if data['rsi']>55:
             signal_filter =1
-        elif data['rsi']<43:
+        elif data['rsi']<45:
             signal_filter =0
         if data['kairi']>1.1 or data['kairi']< -1.07:
             signal_filter = 2
