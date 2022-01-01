@@ -322,7 +322,8 @@ class CandleSignal:
          'Open':'first', 'Close':'last', 'Volum':'sum'}).reset_index()
         
         d['rsi'] = talib.RSI(d.Close, timeperiod=14)
-        df = pd.merge(df, d[['Time','rsi']],how='left',  on=['Time'])    
+        df = pd.merge(df, d[['TimeH','rsi']],how='left',  on=['TimeH'])  
+      
         return df
     def _signal(self,df, df_5m):
         
@@ -377,9 +378,9 @@ class CandleSignal:
         #     signal_filter = 2
 
         signal_filter =None
-        if data['rsi']>55:
+        if data['rsi']>58:
             signal_filter =1
-        elif data['rsi']<45:
+        elif data['rsi']<42:
             signal_filter =0
         if data['kairi']>1.1 or data['kairi']< -1.07:
             signal_filter = 2

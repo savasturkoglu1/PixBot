@@ -77,25 +77,26 @@ class Data:
                
             }
        
+        close_candle = row['x']
 
-        index_names = self.df_1m[ self.df_1m['Time'] == int(row['t']) ].index
-        self.df_1m.drop(index_names, inplace = True)
-        self.df_1m = self.df_1m.append(w, ignore_index=True )
-        
-        if event_time >=row["T"]:  #!= self.time:
-            
+        # index_names = self.df_1m[ self.df_1m['Time'] == int(row['t']) ].index
+        # self.df_1m.drop(index_names, inplace = True)
+      
+        # self.df_1m = self.df_1m.append(w, ignore_index=True )
+
+        if close_candle:
+             self.df_1m = self.df_1m.append(w, ignore_index=True )
              
              self.df_5m = self._dataConvert(300000)
              self.df_15m = self._dataConvert(900000 )            
-            # self.df_30m = self._dataConvert(900000*2)  
-            # self.df_1h = self._dataConvert(900000*4)  
+           
                
-             candle_close = True if (row['T']+1)%300000==0 else False
-             self.Strategy._process( w,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h, candle_close ) 
+             candle_close_5m = True if (row['T']+1)%300000==0 else False
+             self.Strategy._process( w,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h, candle_close_5m ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
-            #  self._writeData()
+            # self._writeData()
              print( 'time ', time )
 
 
