@@ -378,9 +378,9 @@ class CandleSignal:
         #     signal_filter = 2
 
         signal_filter =None
-        if data['rsi']>58:
+        if data['rsi']>55:
             signal_filter =1
-        elif data['rsi']<42:
+        elif data['rsi']<45:
             signal_filter =0
         if data['kairi']>1.1 or data['kairi']< -1.07:
             signal_filter = 2
@@ -403,7 +403,7 @@ class CandleSignal:
              self.long_flag = True   
              self.trade_len = 1        
                          
-             self.stop_price =   df[['Close','Open']].iloc[-2:].values.min()*(1-.001)
+             self.stop_price =   df[['Close','Open']].iloc[-3:].values.min()*(1-.001)
              #close-3*atr          
              
         elif self.signal ==0   and  self.short_flag is False  and self.long_flag is False  and signal_filter in [0,2]:
@@ -413,7 +413,7 @@ class CandleSignal:
              self.trade_len = 1       
                     
             
-             self.stop_price =  df[['Close','Open']].iloc[-2:].values.max()*1.001
+             self.stop_price =  df[['Close','Open']].iloc[-3:].values.max()*1.001
         else:
             if self.trade_len is not None:
                   self.trade_len +=1

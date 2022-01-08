@@ -212,7 +212,7 @@ class Trade:
                             quantity=self.quantity, 
                             side= self.triggerSide,
                             type='STOP',
-                            #reduceOnly=True,
+                            reduceOnly=True,
                             price = self.stopPrice,           
                             stopPrice = self.stopPrice
                             #timeInForce=Client.TIME_IN_FORCE_GTC
@@ -254,7 +254,7 @@ class Trade:
                             side= self.triggerSide,
                             type='TAKE_PROFIT',
                             price = self.profitPrice,     
-                            #reduceOnly=True,     
+                            reduceOnly=True,     
                             stopPrice = self.profitPrice
                             #timeInForce=Client.TIME_IN_FORCE_GTC
                             )

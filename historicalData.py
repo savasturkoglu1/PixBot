@@ -12,7 +12,7 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=1, look_back_short=1):
+    def __init__(self, client,coin,look_back=2, look_back_short=1):
 
         self.client = client
         self.coin   = coin
@@ -26,6 +26,7 @@ class GetData:
         self.intervals = {
                     '_1m' : Client.KLINE_INTERVAL_1MINUTE,
                     '_5m' : Client.KLINE_INTERVAL_5MINUTE,
+                    '_3m' : Client.KLINE_INTERVAL_3MINUTE,
                     '_15m' : Client.KLINE_INTERVAL_15MINUTE,
                     '_30m' : Client.KLINE_INTERVAL_30MINUTE,
                     '_1h' : Client.KLINE_INTERVAL_1HOUR,
@@ -56,7 +57,7 @@ class GetData:
             back= self.from_date_back
             # if period in self.periods[:2]:
             #     back = self.from_date_back_short
-            path = self.file_path+self.coin+period+'_last1.csv'
+            path = self.file_path+self.coin+period+'_last2.csv'
             print(self.coin, self.intervals[period], back)
             data_ = self.client.futures_historical_klines(self.coin, self.intervals[period], back)  
             df = pd.DataFrame(data_)
