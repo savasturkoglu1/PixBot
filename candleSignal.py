@@ -1,6 +1,7 @@
 import talib
 import pandas as pd
 import numpy as np
+from scipy.signal import argrelextrema
 class CandleSignal:
     
     def __init__(self):
@@ -316,7 +317,8 @@ class CandleSignal:
         return 100 * (trend_short - trend_long)/trend_long
     def _data(self, df):
         df = self._candlestick(df)
-        df['kairi'] =  self._kairi(df.Close,144)
+        #df = self._getPeaks(df,8)
+        
         df['TimeH'] = df.Time.apply(lambda x: x//300000)
         d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
          'Open':'first', 'Close':'last', 'Volum':'sum'}).reset_index()
@@ -325,6 +327,23 @@ class CandleSignal:
         df = pd.merge(df, d[['TimeH','rsi']],how='left',  on=['TimeH'])  
       
         return df
+    def _getPeaks(self,df, order=8):
+        
+                df = df.reset_index()
+                max_idx = argrelextrema(df['Close'].values, 
+                np.greater, order=order)[0]
+                
+                min_idx = argrelextrema(df['Close'].values, 
+                np.less, order=order)[0]
+                    
+                
+                for i in max_idx:
+                    df.loc[df.index==i, ['peak', 'waley']] = [df.iloc[i]['Close'], np.nan]
+                for j in min_idx:
+                    df.loc[df.index==j, ['peak', 'waley']] = [np.nan, df.iloc[j]['Close']]
+                    
+
+                return df
     def _signal(self,df, df_5m):
         
         df = self._data(df)
@@ -340,7 +359,8 @@ class CandleSignal:
         'close_short':np.nan,'stop_price':np.nan, 'trailing_stop':np.nan,
                 'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan}
         
-     
+        # peaks = df[-200:][df[-200:].peak.notna()].peak.to_list()
+        # waley = df[-200:][df[-200:].waley.notna()].waley.to_list()
         trade, rank,match = self._pattern_signal(df[self.candle_names].iloc[-2].to_dict())
         
         # if trade ==1 and rank<38 and match>2 and data['Close']>data['Open']:
@@ -349,41 +369,28 @@ class CandleSignal:
         #     self.signal = 0
         # else:
         #     self.signal = None
-        if trade ==1 and rank<37 and match>1 :# and data['Close']>=data['Open']:
-                # if self.short_flag is False and self.long_flag is False:
-                #     if data['Close']>=data['Open']:
-                #        self.signal =1
-                #     else:
-                #        self.signal = None
-                # else:
+        if trade ==1 and rank<37 and match>1 :
                     self.signal =1
-        elif trade == 0 and rank<40 and  match>1:# and data['Close']<=data['Open']:
-            # if self.short_flag is False and self.long_flag is False:
-            #     if data['Close']<=data['Open']:
-            #       self.signal =0
-            #     else:
-            #       self.signal = None
-            # else:
+        elif trade == 0 and rank<40 and  match>1:
                self.signal =0
         else:
             self.signal = None
 
-        # signal_filter =None
-        # if list(rsi)[-1]>57:
-        #     signal_filter =1
-        # elif list(rsi)[-1]<43:
-        #     signal_filter =0
-
-        # if list(kairi)[-1]>1.1 or list(kairi)[-1]< -1.07:
-        #     signal_filter = 2
-
+        
         signal_filter =None
-        if data['rsi']>55:
+        if data['rsi']>60:
             signal_filter =1
-        elif data['rsi']<45:
+        elif data['rsi']<40:
             signal_filter =0
-        if data['kairi']>1.1 or data['kairi']< -1.07:
-            signal_filter = 2
+        # if data['kairi']>1.1 or data['kairi']< -1.07:
+        #     signal_filter = 2
+        # signal_filter =None
+        # if self.signal==1  :
+        #     if    waley[-2] <waley[-1] and df.iloc[-3:].waley.sum() !=0:
+        #         signal_filter = 1
+        # elif self.signal==0  :
+        #     if  peaks[-2]>peaks[-1]and df.iloc[-3:].peak.sum() !=0:
+        #         signal_filter = 0
 
         if self.signal == 1 and self.short_flag is True  and self.trade_len >3:
             row['close_short'] = close
@@ -403,7 +410,7 @@ class CandleSignal:
              self.long_flag = True   
              self.trade_len = 1        
                          
-             self.stop_price =   df[['Close','Open']].iloc[-3:].values.min()*(1-.001)
+             self.stop_price =   df[['Close','Open']].iloc[-3:].values.min()*(1-.0015)
              #close-3*atr          
              
         elif self.signal ==0   and  self.short_flag is False  and self.long_flag is False  and signal_filter in [0,2]:
@@ -413,7 +420,7 @@ class CandleSignal:
              self.trade_len = 1       
                     
             
-             self.stop_price =  df[['Close','Open']].iloc[-3:].values.max()*1.001
+             self.stop_price =  df[['Close','Open']].iloc[-3:].values.max()*1.0015
         else:
             if self.trade_len is not None:
                   self.trade_len +=1
@@ -423,7 +430,7 @@ class CandleSignal:
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
-           self.leverage  = max(min(np.ceil(1/self.stop_limit) ,15),3)
+           self.leverage  = max(min(np.ceil(0.9/self.stop_limit) ,15),2)
            
            take_profit = None
            if   True: # 

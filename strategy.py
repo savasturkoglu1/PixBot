@@ -43,7 +43,7 @@ class Strategy:
         self.Signal = Signals()
         self.PA = PriceAction()
         self.Trade = Trade(self.client, self.coin)
-        self.Logs = Logs()
+        self.Logs = Logs(self.coin)
       #  self.CSP = CspSignal(self.coin)
         self.Candle  = CandleSignal()
         ### sources

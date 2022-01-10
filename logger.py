@@ -9,11 +9,12 @@ import logging.config
 
 
 class Logs():
-    def __init__(self):
+    def __init__(self, coin='_'):
         
         self.logday ='2021-10-16'
         self.logger=logging.getLogger()
         self.logger.setLevel(logging.INFO)
+        self.coin =coin
         self._setLogger()
         #logging.getLogger('client').disabled
 
