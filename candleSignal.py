@@ -430,7 +430,7 @@ class CandleSignal:
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
-           self.leverage  = max(min(np.ceil(0.9/self.stop_limit) ,15),2)
+           self.leverage  = max(min(np.ceil(0.95/self.stop_limit) ,15),2)
            
            take_profit = None
            if   True: # 
