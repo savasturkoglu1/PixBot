@@ -317,7 +317,7 @@ class CandleSignal:
         return 100 * (trend_short - trend_long)/trend_long
     def _data(self, df):
         df = self._candlestick(df)
-        #df = self._getPeaks(df,8)
+        df = self._getPeaks(df,120)
         
         df['TimeH'] = df.Time.apply(lambda x: x//300000)
         d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
@@ -329,7 +329,7 @@ class CandleSignal:
         return df
     def _getPeaks(self,df, order=8):
         
-                df = df.reset_index()
+                df = df.reset_index(drop=True)
                 max_idx = argrelextrema(df['Close'].values, 
                 np.greater, order=order)[0]
                 
@@ -338,9 +338,9 @@ class CandleSignal:
                     
                 
                 for i in max_idx:
-                    df.loc[df.index==i, ['peak', 'waley']] = [df.iloc[i]['Close'], np.nan]
+                    df.loc[df.index==i, ['peak', 'waley', 'zz']] = [df.iloc[i]['Close'], np.nan,df.iloc[i]['Close']]
                 for j in min_idx:
-                    df.loc[df.index==j, ['peak', 'waley']] = [np.nan, df.iloc[j]['Close']]
+                    df.loc[df.index==j, ['peak', 'waley', 'zz']] = [np.nan, df.iloc[j]['Close'], df.iloc[j]['Close']]
                     
 
                 return df
@@ -360,7 +360,7 @@ class CandleSignal:
                 'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan}
         
         # peaks = df[-200:][df[-200:].peak.notna()].peak.to_list()
-        # waley = df[-200:][df[-200:].waley.notna()].waley.to_list()
+        zz = df[-500:][df[-500:].zz.notna()].zz.to_list()
         trade, rank,match = self._pattern_signal(df[self.candle_names].iloc[-2].to_dict())
         
         # if trade ==1 and rank<38 and match>2 and data['Close']>data['Open']:
@@ -378,10 +378,14 @@ class CandleSignal:
 
         
         signal_filter =None
-        if data['rsi']>60:
-            signal_filter =1
-        elif data['rsi']<40:
-            signal_filter =0
+        if close >zz[-1] :
+             signal_filter = 1
+        elif close <zz[-1] :
+            signal_filter = 0
+        # if data['rsi']>60:
+        #     signal_filter =1
+        # elif data['rsi']<40:
+        #     signal_filter =0
         # if data['kairi']>1.1 or data['kairi']< -1.07:
         #     signal_filter = 2
         # signal_filter =None
