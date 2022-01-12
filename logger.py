@@ -33,7 +33,7 @@ class Logs():
         d = datetime.today().strftime('%Y-%m-%d')
         
 
-        if d !=self.logday:
+        if True:# d !=self.logday:
             self.logday = d
             d = d.replace('-','_')
             
@@ -47,6 +47,12 @@ class Logs():
                 encoding=None,
                 delay=0
             )
+          
+            # logging.config.dictConfig({
+            #     'version': 1,
+            #     # Other configs ...
+            #     'disable_existing_loggers': True
+            # })
             logging.basicConfig( 
                                 format='%(asctime)s %(message)s', 
                                 handlers=[ rfh ])

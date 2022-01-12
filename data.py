@@ -43,7 +43,7 @@ class Data:
 
 
     def _dataProcess(self, msg):
-        print(msg)
+        
         if self.df_1m is None:
             self._setDataframes()
             
