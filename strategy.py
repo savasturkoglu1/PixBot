@@ -114,7 +114,7 @@ class Strategy:
             self.signals =  self.Candle._signal(self.df, self.df_5m)
             params = self._tradeParams()
             
-            
+            print(self.coin)
             print(self.coin,self.signals, params)
             if  params is not None  : 
                 self.Logs._writeLog(self.coin+'-csp order params   '+ str(params)+'\n'+str(self.params))   

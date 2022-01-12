@@ -251,7 +251,7 @@ class CandleSignal:
                         'CDLLADDERBOTTOM': 59,
                         'CDLKICKINGBYLENGTH': 60,
                         'CDLHOMINGPIGEON': 61}
-        
+        #self._candleName()
 
     def _candlestick(self,df):
         
@@ -297,19 +297,35 @@ class CandleSignal:
 
             
 
+    def _candleName(self):
+        candle_names = talib.get_function_groups()['Pattern Recognition']
+        exclude_items = ('CDLCOUNTERATTACK',
+                                'CDLLONGLINE',
+                                'CDLSHORTLINE',
+                                'CDLSTALLEDPATTERN',
+                                'CDLKICKINGBYLENGTH')
 
+                                #'CDLLONGLEGGEDDOJI', 'CDLDOJI', 'CDLRICKSHAWMAN', 'CDLENGULFING','CDLSPINNINGTOP',
+
+        self.candle_names = [candle for candle in candle_names if candle not in exclude_items]
        
+    def _kairi(self, src, length):
+        
+        trend_long = talib.EMA(src, 144)
+        trend_short = talib.EMA(src, 55)
+     
 
+        return 100 * (trend_short - trend_long)/trend_long
     def _data(self, df):
         df = self._candlestick(df)
         df = self._getPeaks(df,120)
         
-        # df['TimeH'] = df.Time.apply(lambda x: x//300000)
-        # d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
-        #  'Open':'first', 'Close':'last', 'Volum':'sum'}).reset_index()
+        df['TimeH'] = df.Time.apply(lambda x: x//300000)
+        d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
+         'Open':'first', 'Close':'last', 'Volum':'sum'}).reset_index()
         
-        # d['rsi'] = talib.RSI(d.Close, timeperiod=14)
-        # df = pd.merge(df, d[['TimeH','rsi']],how='left',  on=['TimeH'])  
+        d['rsi'] = talib.RSI(d.Close, timeperiod=14)
+        df = pd.merge(df, d[['TimeH','rsi']],how='left',  on=['TimeH'])  
       
         return df
     def _getPeaks(self,df, order=8):
@@ -345,9 +361,9 @@ class CandleSignal:
                 'leverage':np.nan,'take_profit':np.nan, 'stop_limit':np.nan}
         
         # peaks = df[-200:][df[-200:].peak.notna()].peak.to_list()
-        k =df[df.zz.notna()]
+      #  k =df[-500:][df[-500:].zz.notna()]
        # print(k.iloc[-1].zz, datetime.utcfromtimestamp(int(k.iloc[-1].Time//1000)).strftime("%Y-%m-%d %H:%M:%S") )
-        zz = k.zz.to_list()
+      #  zz = k.zz.to_list()
         trade, rank,match = self._pattern_signal(df[self.candle_names].iloc[-2].to_dict())
         
         # if trade ==1 and rank<38 and match>2 and data['Close']>data['Open']:
@@ -365,11 +381,23 @@ class CandleSignal:
 
         
         signal_filter =None
-        if close > zz[-1]*1.003 :
-             signal_filter = 1
-        elif close <zz[-1]*0.997  :
-            signal_filter = 0
-        
+        # if close >zz[-1] :
+        #      signal_filter = 1
+        # elif close <zz[-1] :
+        #     signal_filter = 0
+        if data['rsi']>60:
+            signal_filter =1
+        elif data['rsi']<40:
+            signal_filter =0
+        # if data['kairi']>1.1 or data['kairi']< -1.07:
+        #     signal_filter = 2
+        # signal_filter =None
+        # if self.signal==1  :
+        #     if    waley[-2] <waley[-1] and df.iloc[-3:].waley.sum() !=0:
+        #         signal_filter = 1
+        # elif self.signal==0  :
+        #     if  peaks[-2]>peaks[-1]and df.iloc[-3:].peak.sum() !=0:
+        #         signal_filter = 0
 
         if self.signal == 1 and self.short_flag is True  and self.trade_len >3:
             row['close_short'] = close
