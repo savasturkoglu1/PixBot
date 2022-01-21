@@ -12,7 +12,7 @@ class CspSignal:
     def __init__(self, coin):
         
        # self.model_path = "/home/savas/Desktop/BotDev/backtest/data/xgb_ETHUSDT.model"
-        self.model_path = base_path+"/source/model/"+coin+".model"
+        self.model_path = base_path+"/source/model/xgb_box.model"
         self.model = None
         
         self.cols = ['stick_body_ratio', 'candle_length_perc',
@@ -58,13 +58,11 @@ class CspSignal:
             ###
 
             
-            if d[i]['Open']>d[i]['Close']:
-                dr = -1
-            elif d[i]['Open']<d[i]['Close']:
-                dr = 1
-            else:
-                dr =0
+            dr = 1 if d[i]['Close']>d[i]['Open'] else 0
+            if np.abs(d[i]['Close']-d[i]['Open'])/(d[i]['High']-d[i]['Low'])<0.05:
+               dr =2
             row.append(dr)
+          
         
 
         return row
@@ -95,7 +93,7 @@ class CspSignal:
     
 
     def _signal(self,df):
-        df = self._candle(df)
+       # df = self._candle(df)
         df['atr'] = atr = talib.ATR(df.High, df.Low, df.Close, timeperiod=14).tolist()
         data = df.iloc[-1].to_dict()
         close = df.iloc[-1].Close
@@ -109,10 +107,10 @@ class CspSignal:
         p = self.model.predict_proba([self._boxData(df[-3:])])
         p = p.tolist()[0]
  
-        if p[0]>0.63 :
+        if p[0]>0.62 :
             self.sell_point = close
             self.buy_point = None
-        elif p[1]>0.64 :
+        elif p[1]>0.62 :
             self.sell_point = None
             self.buy_point = close
         
@@ -138,28 +136,28 @@ class CspSignal:
             row['position'] = 'CLOSE_LONG'
             self.long_flag = False    
 
-        elif self.signal == 1  and self.long_flag is False:
+        elif self.signal == 1  and self.long_flag is False and  self.short_flag is False:
              row['open_long'] = close
              row['position'] = 'OPEN_LONG'
              self.long_flag = True           
                          
-             self.stop_price = close-2*atr          
+             self.stop_price =close-2*atr # df[['Close','Open']].iloc[-3:].values.min()*(1-.0015) #         
              
-        elif self.signal ==0  and  self.short_flag is False:
+        elif self.signal ==0  and  self.short_flag is False and self.long_flag is False:
 
              row['open_short'] = close
              row['position'] = 'OPEN_SHORT'
              self.short_flag = True         
                     
             
-             self.stop_price =close+2*atr
+             self.stop_price =close+2*atr# df[['Close','Open']].iloc[-3:].values.max()*1.0015 #
             
              
        
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
-           self.leverage  =max(min(np.ceil(3/self.stop_limit) ,7),3)
+           self.leverage  =max(min(np.ceil(2/self.stop_limit) ,12),3)
            
            take_profit = None
            if   True: # 
@@ -168,9 +166,9 @@ class CspSignal:
                 # if self.short_flag is True:
                 #      take_profit =(1-.02)*data['Close'] #(1-self.stop_limit/100*3)*data['Close']
                 if self.long_flag is True:
-                     take_profit = (1+self.stop_limit/100*5)*data['Close']
+                     take_profit = (1+self.stop_limit/100*4)*data['Close']
                 if self.short_flag is True:
-                     take_profit =(1-self.stop_limit/100*5)*data['Close']
+                     take_profit =(1-self.stop_limit/100*4)*data['Close']
            row['leverage'] = self.leverage
            row['stop_limit'] = self.stop_limit
            row['trailing_stop'] = False

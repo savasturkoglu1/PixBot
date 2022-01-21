@@ -12,11 +12,11 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=1, look_back_short=1):
+    def __init__(self, client,coin,look_back=400, look_back_short=1):
 
         self.client = client
         self.coin   = coin
-        self.file_path = '/home/savas/Desktop/BotDev/src/data/' #base_path+'/data/'
+        self.file_path = '/home/savas/Desktop/BotDev/src/data/train/' #base_path+'/data/'
         
         self.look_back = look_back
         self.look_back_short = look_back_short
@@ -57,7 +57,7 @@ class GetData:
             back= self.from_date_back
             # if period in self.periods[:2]:
             #     back = self.from_date_back_short
-            path = self.file_path+self.coin+period+'_last1.csv'
+            path = self.file_path+self.coin+period+'_long.csv'
             print(self.coin, self.intervals[period], back)
             data_ = self.client.futures_historical_klines(self.coin, self.intervals[period], back)  
             df = pd.DataFrame(data_)
@@ -74,6 +74,7 @@ if __name__ == '__main__':
 'LINKUSDT', 'LTCUSDT','CHZUSDT','BNBUSDT','BCHUSDT','VETUSDT','XTZUSDT', 'DASHUSDT','HOTUSDT',
 'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT','AVAXUSDT', 'FILUSDT','BTCUSDT','ETHUSDT'] 
     coins = ['DOTUSDT', 'ADAUSDT', 'ETHUSDT', 'BTCUSDT','XRPUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT', #'BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT', 'DOTUSDT','XRPUSDT'
-    for i in ['LINKUSDT']: #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'BNBUSDT']: #['XLMUSDT', 'ATOMUSDT', 'LINKUSDT', 'ETCUSDT']:
+    for i in ['XRPUSDT', 'XLMUSDT','LTCUSDT','AVAXUSDT','BNBUSDT', 'ETHUSDT', 'BTCUSDT']:
+    # ['LINKUSDT', 'ATOMUSDT', 'DOTUSDT']: #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'BNBUSDT']: #['XLMUSDT', 'ATOMUSDT', 'LINKUSDT', 'ETCUSDT']:
         d = GetData(iClient().client,i)
         d._getData()
