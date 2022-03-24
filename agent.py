@@ -70,7 +70,7 @@ class Agent:
         self.t_table = model['t_table']
       
     def signal(self, df, instant_pnl, position):
-        print('s')
+        
         df = self.data(df)
         state = int(df.iloc[-1].state)
        
@@ -104,5 +104,5 @@ class Agent:
 
 
        
-             
+        print('agent', state, action, leverage, self.expected_pnl)     
         return action,leverage

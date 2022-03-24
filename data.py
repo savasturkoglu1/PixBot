@@ -31,10 +31,10 @@ class Data:
 
         
         
-        self.time =0
+        self.timer =0
 
     def _setDataframes(self):
-        self.df_1m = pd.read_csv(base_path+'/data/'+self.coin+'_1m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
+        self.df_15m = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
         # self.df_5m = pd.read_csv(base_path+'/data/'+self.coin+'_5m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#   
         # self.df_15m = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
         # self.df_30m = pd.read_csv(base_path+'/data/'+self.coin+'_30m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])# 
@@ -43,28 +43,17 @@ class Data:
 
 
     def _dataProcess(self, msg):
-        
+        self.timer +=1
         if self.df_1m is None:
             self._setDataframes()
             
         resp = json.loads(json.dumps(msg))
         row = resp.get("k")
-        event_time = resp.get('E')
+       
 
         ''' df shortener'''
         if self.df_1m.shape[0]>3500:
-            self.df_1m = self.df_1m.tail(self.max_len).copy()  
-            
-        
-     
-
-        '''  clear duplicates '''
-        # self.df_15m = self.df_15m.drop_duplicates(subset=['Time'], keep='last')
-        # self.df_30m = self.df_30m.drop_duplicates(subset=['Time'], keep='last')
-        # self.df_1h = self.df_1h.drop_duplicates(subset=['Time'], keep='last')
-        # self.df_5m = self.df_5m.drop_duplicates(subset=['Time'], keep='last')
-
-
+            self.df_1m = self.df_1m.tail(self.max_len).copy() 
         
         w = {
                 "Time" :int(row['t']),
@@ -83,17 +72,16 @@ class Data:
         # self.df_1m.drop(index_names, inplace = True)
       
         # self.df_1m = self.df_1m.append(w, ignore_index=True )
-
+        
+        if self.timer%60==0:
+            self.Strategy._live(w)
+            print(msg) 
         if close_candle:
-             print(msg)
-             self.df_1m = self.df_1m.append(w, ignore_index=True )
              
-             self.df_5m = self._dataConvert(300000)
-             self.df_15m = self._dataConvert(900000 )            
-           
-               
-             candle_close_15m = True if (row['T']+1)%900000==0 else False
-             self.Strategy._signal( w,self.df_1m, self.df_5m, self.df_15m,self.df_30m, candle_close_15m ) 
+             self.df_15m = self.df_15m.append(w, ignore_index=True )           
+             self.df_1h = self._dataConvert(3600000 )                      
+                           
+             self.Strategy._signal(  self.df_15m,self.df_1h ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
@@ -104,37 +92,15 @@ class Data:
         
         
     def _dataConvert(self, ms):
-        df =self.df_1m
+        df =self.df_15m
         df['TimeH'] = df.Time.apply(lambda x: x//ms)
         d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
          'Open':'first', 'Close':'last',"CloseTime":"last", 'Volum':'sum'}).reset_index()
         return d
-    def _dataConvert2(self, ms, df):
-        
 
-        
-        if self.df_1m.iloc[-1].to_dict()['Time']%ms==0:
-                 df = df.append(self.df_1m.tail(1), ignore_index=True)
-            
-        else:
-            last_row =df.iloc[-1].to_dict()
-            row = self.df_1m.iloc[-1].to_dict()
-
-
-            Close = row['Close'] 
-            High = max(last_row['High'], row['High'])
-            Low = min(last_row['Low'], row['Low'])  
-            #Volum = last_row['Volum'] + row['Volum']        
-           
-            df.loc[df.index[-1],['Close','High','Low']] = [Close, High, Low]
-        return df
     
     def _writeData(self):
-            
-     
 
-         self.df_5m.to_csv(base_path+'/data/obs/'+self.coin+'df_5m.csv')
-       #  self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')
-       #  self.df_30m.to_csv(base_path+'/data/obs/'+self.coin+'df_30m.csv')
-         self.df_1m.to_csv(base_path+'/data/obs/'+self.coin+'df_1m.csv')
+         self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')      
+         self.df_1h.to_csv(base_path+'/data/obs/'+self.coin+'df_1h.csv')
         

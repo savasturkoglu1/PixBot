@@ -57,24 +57,23 @@ class Strategy:
         self.short_flag = False
         self.position = None
         self.entry_price = None
-
-    def _signal(self, live ,df_1m, df_5m, df_15m, df_30m, candle_close):
-
-        ## set data frames
-        self.df_1m = df_1m
-        self.df_5m = df_5m
-        self.df_15m = df_15m
-        self.df_30m = df_30m
-        
-        self.live  = live
-        self.candle_close = candle_close
-
+    def _live(self, data):
         self.Trade._live(self.live)        
 
         self.position = self.Trade.position
         if self.position is None:
                 self.long_flag = False
                 self.short_flag = False
+    def _signal(self, df_15m, df_1h):
+
+        ## set data frames
+        
+        self.df_15m = df_15m
+        self.df_1h = df_1h
+        
+       
+
+        live = self.df_15m.iloc[-1].to_dict()
 
         instant_pnl = 0
         if self.position == 1:
@@ -82,13 +81,13 @@ class Strategy:
         elif self.position == 0:
             instant_pnl = (self.entry_price-live['Close'])/self.entry_price*100
         
-        signal,leverage = 2,1
-        if candle_close:
-          signal, leverage = self.Agent.signal(self.df_15m, instant_pnl, self.position)
+        signal = 2
+        leverage = 1
+        signal, leverage = self.Agent.signal(self.df_15m, instant_pnl, self.position)
 
         if signal !=2:
             
-            params = self._params(signal,self.live, leverage)
+            params = self._params(signal,self.df_15m, leverage)
 
             print(self.coin, params)
             self.Logs._writeLog(self.coin+'-agent order params   '+ str(params))   
