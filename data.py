@@ -8,7 +8,7 @@ import pickle
 from numpy import savetxt
 from datetime import datetime
 
-from strategy import Strategy
+from strg  import Strategy
 from env import base_path
 
 class Data:
@@ -85,6 +85,7 @@ class Data:
         # self.df_1m = self.df_1m.append(w, ignore_index=True )
 
         if close_candle:
+             print(msg)
              self.df_1m = self.df_1m.append(w, ignore_index=True )
              
              self.df_5m = self._dataConvert(300000)

@@ -8,6 +8,7 @@ import talib
 from agent import Agent
 from trade import Trade
 from logger import Logs
+
 class Strategy:
 
     def __init__(self, client,coin):
@@ -86,8 +87,10 @@ class Strategy:
           signal, leverage = self.Agent.signal(self.df_15m, instant_pnl, self.position)
 
         if signal !=2:
-            print(self.coin,self.signals, params)
+            
             params = self._params(signal,self.live, leverage)
+
+            print(self.coin, params)
             self.Logs._writeLog(self.coin+'-agent order params   '+ str(params))   
             self.Trade._order(**params)
 
@@ -145,30 +148,7 @@ class Strategy:
            row['take_profit'] = take_profit
            row['profit_price'] = round(take_profit, self.prc[self.coin])
         return row
-    def _tradeParams(self, signal):
-        params=None
-        if self.signals['position'] == 'CLOSE_LONG' or self.signals['position'] == 'CLOSE_SHORT':
-            params=dict(
-                order_type=self.signals['position'],
-                trade_type='LONG' if self.signals['position'] == 'CLOSE_LONG' else 'SHORT',
-                price=self.signals['close_long'] if self.signals['position'] == 'CLOSE_LONG' else self.signals['close_short'],
-                
-            )
-        elif self.signals['position'] == 'OPEN_LONG' or self.signals['position'] == 'OPEN_SHORT':
-            p = self.signals['open_long'] if self.signals['position'] == 'OPEN_LONG' else self.signals['open_short']
-            params=dict(
-                order_type=self.signals['position'],
-                trade_type='LONG' if self.signals['position'] == 'OPEN_LONG' else 'SHORT',
-                price=round(p, self.prc[self.coin]),
-                stop_price =round(self.signals['stop_price'], self.prc[self.coin]),
-                stop_limit =round(self.signals['stop_limit'],3),
-                profit_price=round(self.signals['take_profit'], self.prc[self.coin]) if self.signals['take_profit'] is not None else None,
-                leverage=self.signals['leverage'],
-                take_profit = self.signals['take_profit']
-            )
-        
-        return params
-    
+
  
 
     

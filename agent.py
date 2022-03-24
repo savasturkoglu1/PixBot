@@ -37,9 +37,28 @@ class Agent:
         ## trade vals
         self.state_list= []
         self.expected_pnl = 0
+    def candlestick(self,df):
         
+
+            op = df['Open'].astype(float)
+            hi = df['High'].astype(float)
+            lo = df['Low'].astype(float)
+            cl = df['Close'].astype(float)
+
+            candle_names = talib.get_function_groups()['Pattern Recognition']
+
+          
+
+            
+            # create columns for each candle
+            for candle in candle_names:
+                # below is same as;
+                # df["CDL3LINESTRIKE"] = talib.CDL3LINESTRIKE(op, hi, lo, cl)
+                df[candle] = getattr(talib, candle)(op, hi, lo, cl)
+            return df
     def data(self, df):
-        df = pd.merge(df, self.candle_cluster,how='left',  on=talib.get_function_groups()['Pattern Recognition'])
+        df =self.candlestick(df)
+        df = pd.merge(df, self.candle_cluster,how='left',  on=self.cols)
         df = df.dropna().reset_index(drop=True)
         return df
 
@@ -51,7 +70,7 @@ class Agent:
         self.t_table = model['t_table']
       
     def signal(self, df, instant_pnl, position):
-       
+        print('s')
         df = self.data(df)
         state = int(df.iloc[-1].state)
        
