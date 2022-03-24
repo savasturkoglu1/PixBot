@@ -31,7 +31,7 @@ class Data:
 
         
         
-        self.time = self.df_5m.tail(1).iloc[0]['Time'] if self.df_1m is not None else 0
+        self.time =0
 
     def _setDataframes(self):
         self.df_1m = pd.read_csv(base_path+'/data/'+self.coin+'_1m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
@@ -91,8 +91,8 @@ class Data:
              self.df_15m = self._dataConvert(900000 )            
            
                
-             candle_close_5m = True if (row['T']+1)%300000==0 else False
-             self.Strategy._process( w,self.df_1m, self.df_5m, self.df_15m,self.df_30m, self.df_1h, candle_close_5m ) 
+             candle_close_15m = True if (row['T']+1)%900000==0 else False
+             self.Strategy._signal( w,self.df_1m, self.df_5m, self.df_15m,self.df_30m, candle_close_15m ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")

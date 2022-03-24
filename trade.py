@@ -17,7 +17,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.48
+        self.marginRate = 0.97
         self.stopRate = 2
         self.profitRate = 7
         
@@ -86,10 +86,10 @@ class Trade:
             if self.takeProfitStatus is False:
                 self._takeProfit()
             self._checkPosition()
-            # if self.takeProfitStatus is True:
-            #     self._checkProfit()
-            # if self.setStopStatus is True:
-            #     self._checkStop()    
+            if self.takeProfitStatus is True:
+                self._checkProfit()
+            if self.setStopStatus is True:
+                self._checkStop()    
     def _order(self, **kwargs):
         self._checkPosition()
         params = None
@@ -361,7 +361,7 @@ class Trade:
         
        
     def _checkProfit(self):
-        return
+        
         self.Logs._writeLog('profit order  '+ str(self.profitOrderId)) 
 
         try:
@@ -380,7 +380,7 @@ class Trade:
         except BinanceAPIException as e:
                  self.Logs._writeLog('order error  '+ str(e))  
     def _checkStop(self):
-        return
+        
         order = self.client.futures_get_order(symbol=self.symbol,orderId=self.stopOrderId)
 
         if order['status'] == 'FILLED':

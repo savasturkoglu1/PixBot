@@ -22,9 +22,9 @@ class Socket:
         self.Client = client
         self.Data = Data(self.Client.client, self.coin)
         self.GetData = GetData(self.Client.client, self.coin)
-
+ 
         self.bm = ThreadedWebsocketManager(api_key=self.Client.api_key, api_secret=self.Client.api_secret)
-        #self.bm.FUTURES_URL = 'wss://fstream.binance.com'
+        
         self.connection_key = None
         
        
@@ -34,8 +34,8 @@ class Socket:
         if msg['e'] == 'error':
             self._stopSocket()
             self._startSocket()
-        
-        self.Data._dataProcess(msg)
+        else:
+          self.Data._dataProcess(msg)
 
     def _startSocket(self):
         

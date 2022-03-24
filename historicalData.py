@@ -12,7 +12,7 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=400, look_back_short=1):
+    def __init__(self, client,coin,look_back=300, look_back_short=1):
 
         self.client = client
         self.coin   = coin
@@ -22,7 +22,7 @@ class GetData:
         self.look_back_short = look_back_short
 
         ## periods
-        self.periods = ['_1m'] #,'_30m','_1h','_5m','_15m'
+        self.periods = ['_15m'] #,'_30m','_1h','_5m','_15m'
         self.intervals = {
                     '_1m' : Client.KLINE_INTERVAL_1MINUTE,
                     '_5m' : Client.KLINE_INTERVAL_5MINUTE,
@@ -57,7 +57,7 @@ class GetData:
             back= self.from_date_back
             # if period in self.periods[:2]:
             #     back = self.from_date_back_short
-            path = self.file_path+self.coin+period+'_long.csv'
+            path = self.file_path+self.coin+period+'_mid.csv'
             print(self.coin, self.intervals[period], back)
             data_ = self.client.futures_historical_klines(self.coin, self.intervals[period], back)  
             df = pd.DataFrame(data_)
@@ -70,11 +70,12 @@ if __name__ == '__main__':
    
     
     from client import iClient
-    c = ['XRPUSDT', 'XLMUSDT', 
-'LINKUSDT', 'LTCUSDT','CHZUSDT','BNBUSDT','BCHUSDT','VETUSDT','XTZUSDT', 'DASHUSDT','HOTUSDT',
-'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT','AVAXUSDT', 'FILUSDT','BTCUSDT','ETHUSDT'] 
+    c = ['LTCUSDT','CHZUSDT','BCHUSDT','VETUSDT','XTZUSDT', 'DASHUSDT','HOTUSDT',
+'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT', 'FILUSDT'] 
+    
     coins = ['DOTUSDT', 'ADAUSDT', 'ETHUSDT', 'BTCUSDT','XRPUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT', #'BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT', 'DOTUSDT','XRPUSDT'
-    for i in ['XRPUSDT', 'XLMUSDT','LTCUSDT','AVAXUSDT','BNBUSDT', 'ETHUSDT', 'BTCUSDT']:
+    for i in  c:
+    #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'XRPUSDT', 'ETHUSDT', 'BNBUSDT','BTCUSDT','AVAXUSDT']:
     # ['LINKUSDT', 'ATOMUSDT', 'DOTUSDT']: #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'BNBUSDT']: #['XLMUSDT', 'ATOMUSDT', 'LINKUSDT', 'ETCUSDT']:
         d = GetData(iClient().client,i)
-        d._getData()
+        d._getData()       
