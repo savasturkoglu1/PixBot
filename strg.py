@@ -121,7 +121,7 @@ class Strategy:
              row['trade_type'] = 'LONG'
              self.long_flag = True           
              self.entry_price = close             
-             self.stop_price =close-2*atr         
+             self.stop_price =max(close-2*atr,close*0.97 )         
              
         elif signal ==0  and  self.short_flag is False and self.long_flag is False:
 
@@ -130,7 +130,7 @@ class Strategy:
              row['trade_type'] = 'SHORT'
              self.short_flag = True        
              self.entry_price = close 
-             self.stop_price =close+2*atr
+             self.stop_price = min(close+2*atr, close*1.02)
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            

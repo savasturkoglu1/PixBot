@@ -3,6 +3,7 @@ import talib
 import pandas as pd 
 import numpy as np
 from env import base_path 
+from logger import Logs
 class Agent:
     
     def __init__(self, coin):
@@ -104,5 +105,6 @@ class Agent:
 
 
        
-        print('agent', state, action, leverage, self.expected_pnl)     
+        print('agent', state, action, leverage, val) 
+        self.Logs._writeLog(self.coin+'-agent signals  --state: '+state+'-- action:'+ action+'-- leverage:'+ leverage+'-- statevaluse:'+ val)      
         return action,leverage
