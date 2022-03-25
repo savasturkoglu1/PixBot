@@ -8,6 +8,7 @@ import logging.config
 
 
 
+
 class Logs():
     def __init__(self, coin='_'):
         
@@ -16,8 +17,8 @@ class Logs():
         self.logger.setLevel(logging.INFO)
         self.coin =coin
         self._setLogger()
-        #logging.getLogger('client').disabled
-
+       
+        
     def _writeLog(self, message, level='info'):
         self._setLogger() 
         if level == "info":
