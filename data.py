@@ -32,7 +32,7 @@ class Data:
         
         
         self.timer =0
-        self._setDataframes()
+        
 
     def _setDataframes(self):
         self.df_15m = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
@@ -45,7 +45,8 @@ class Data:
 
     def _dataProcess(self, msg):
         self.timer +=1
-       
+        if self.df_15m is None:
+            self._setDataframes()
             
         resp = json.loads(json.dumps(msg))
         row = resp.get("k")
