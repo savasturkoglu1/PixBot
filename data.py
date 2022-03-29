@@ -79,13 +79,13 @@ class Data:
         if close_candle:
              
              self.df_15m = self.df_15m.append(w, ignore_index=True )           
-             self.df_1h = self._dataConvert(3600000 )                      
+             #self.df_1h = self._dataConvert(3600000 )                      
                            
              self.Strategy._signal(  self.df_15m,self.df_1h ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
-             #self._writeData()
+             self._writeData()
              print( 'time ', time )
 
 
@@ -102,5 +102,5 @@ class Data:
     def _writeData(self):
 
          self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')      
-         self.df_1h.to_csv(base_path+'/data/obs/'+self.coin+'df_1h.csv')
+        # self.df_1h.to_csv(base_path+'/data/obs/'+self.coin+'df_1h.csv')
         

@@ -1,5 +1,6 @@
 
 
+from ctypes import pointer
 from indicator import  Indicator
 from env import base_path
 import pandas as pd
@@ -76,14 +77,17 @@ class Strategy:
         live = self.df_15m.iloc[-1].to_dict()
 
         instant_pnl = 0
-        if self.position == 1:
+        position = None
+        if self.long_flag is True:
             instant_pnl = (live['Close']-self.entry_price)/self.entry_price*100
-        elif self.position == 0:
+            position = 1
+
+        elif self.short_flag is True:
             instant_pnl = (self.entry_price-live['Close'])/self.entry_price*100
+            position = 0
         
-        signal = 2
-        leverage = 1
-        signal, leverage = self.Agent.signal(self.df_15m, instant_pnl, self.position)
+        
+        signal, leverage = self.Agent.signal(self.df_15m, instant_pnl, position)
 
         if signal !=2:
             
@@ -130,7 +134,7 @@ class Strategy:
              row['trade_type'] = 'SHORT'
              self.short_flag = True        
              self.entry_price = close 
-             self.stop_price = min(close+2*atr, close*1.02)
+             self.stop_price = min(close+2*atr, close*1.03)
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            

@@ -59,8 +59,8 @@ class Agent:
             return df
     def data(self, df):
         df =self.candlestick(df)
-        df = pd.merge(df, self.candle_cluster,how='left',  on=self.cols)
-        df = df.dropna().reset_index(drop=True)
+        df = pd.merge(df, self.candle_cluster,how='left',  on=talib.get_function_groups()['Pattern Recognition'])
+       # df = df.dropna().reset_index(drop=True)
         return df
 
     def loadModel(self):
@@ -73,7 +73,12 @@ class Agent:
     def signal(self, df, instant_pnl, position):
         
         df = self.data(df)
-        state = int(df.iloc[-1].state)
+
+        s = df.iloc[-1].state
+        if s !=s:
+            print(s)
+            return 2,1
+        state = int(s)
        
         if position == 1:
             state = state+self.state_size
@@ -97,7 +102,7 @@ class Agent:
                     self.expected_pnl = v
                     leverage = max(np.ceil(self.expected_pnl/0.35),2)
         else:
-              if instant_pnl< self.expected_pnl*2:
+              if instant_pnl< self.expected_pnl*3:
                           action = 2
               
                 
@@ -105,6 +110,6 @@ class Agent:
 
 
        
-        print('agent', state, action, leverage, val) 
+        print('agent', state, action, leverage, val, instant_pnl) 
         self.Logs._writeLog(self.coin+'-agent signals  --state: '+str(state)+'-- action:'+ str(action)+'-- leverage:'+ str(leverage)+'-- statevaluse:'+ str(val))      
         return action,leverage

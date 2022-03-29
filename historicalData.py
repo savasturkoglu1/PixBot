@@ -12,7 +12,7 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=300, look_back_short=1):
+    def __init__(self, client,coin,look_back=200, look_back_short=1):
 
         self.client = client
         self.coin   = coin
@@ -73,8 +73,8 @@ if __name__ == '__main__':
     c = ['LTCUSDT','CHZUSDT','BCHUSDT','VETUSDT','XTZUSDT', 'DASHUSDT','HOTUSDT',
 'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT', 'FILUSDT'] 
     
-    coins = ['DOTUSDT', 'ADAUSDT', 'ETHUSDT', 'BTCUSDT','XRPUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT', #'BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT', 'DOTUSDT','XRPUSDT'
-    for i in  c:
+    coins = ['ATOMUSDT','DOTUSDT', 'ADAUSDT', 'ETHUSDT', 'BTCUSDT','XRPUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT', #'BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT', 'DOTUSDT','XRPUSDT'
+    for i in  ['ATOMUSDT']:
     #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'XRPUSDT', 'ETHUSDT', 'BNBUSDT','BTCUSDT','AVAXUSDT']:
     # ['LINKUSDT', 'ATOMUSDT', 'DOTUSDT']: #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'BNBUSDT']: #['XLMUSDT', 'ATOMUSDT', 'LINKUSDT', 'ETCUSDT']:
         d = GetData(iClient().client,i)

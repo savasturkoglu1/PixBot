@@ -294,7 +294,7 @@ class Trade:
         self.profitLimit = 0
         self.profitPrice = None
         self.stopPrice = None
-        self.leverage =5
+      
        # self._cancelOrder(self.stopOrder)
        
 

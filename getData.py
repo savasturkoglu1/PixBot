@@ -12,7 +12,7 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=2, look_back_short=1):
+    def __init__(self, client,coin,look_back=5, look_back_short=1):
 
         self.client = client
         self.coin   = coin
