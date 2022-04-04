@@ -115,5 +115,5 @@ class Agent:
 
        
         print('agent', state, action, leverage, target, instant_pnl) 
-        self.Logs._writeLog(self.coin+'-agent signals  --state: '+str(state)+'-- action:'+ str(action)+'-- leverage:'+ str(leverage)+'-- statevaluse:'+ str(val))      
+        self.Logs._writeLog(self.coin+'-agent signals  --state: '+str(state)+'-- action:'+ str(action)+'-- leverage:'+ str(leverage)+'-- statevaluse:'+ str(target))      
         return action,leverage
