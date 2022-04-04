@@ -22,7 +22,7 @@ class Data:
         ## data frames
 
         self.df_5m = None
-        self.df_15m = None
+        self.df = None
         self.df_30m = None
         self.df_1h = None
         self.df_1m = None
@@ -35,9 +35,9 @@ class Data:
         
 
     def _setDataframes(self):
-        self.df_15m = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
+        self.df = pd.read_csv(base_path+'/data/'+self.coin+'_1h.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
         # self.df_5m = pd.read_csv(base_path+'/data/'+self.coin+'_5m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#   
-        # self.df_15m = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
+        # self.df = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
         # self.df_30m = pd.read_csv(base_path+'/data/'+self.coin+'_30m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])# 
         # self.df_1h = pd.read_csv(base_path+'/data/'+self.coin+'_1h.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
        
@@ -45,14 +45,14 @@ class Data:
 
     def _dataProcess(self, msg):
         self.timer +=1
-        if self.df_15m is None:
+        if self.df is None:
             self._setDataframes()
             
         resp = json.loads(json.dumps(msg))
         row = resp.get("k")
        
 
-        ''' df shortener'''
+        
        
         
         w = {
@@ -73,15 +73,15 @@ class Data:
       
         # self.df_1m = self.df_1m.append(w, ignore_index=True )
         
-        if self.timer%60==0:
+        if self.timer%120==0:
             self.Strategy._live(w)
             print(msg) 
         if close_candle:
              
-             self.df_15m = self.df_15m.append(w, ignore_index=True )           
+             self.df = self.df.append(w, ignore_index=True )           
              #self.df_1h = self._dataConvert(3600000 )                      
                            
-             self.Strategy._signal(  self.df_15m,self.df_1h ) 
+             self.Strategy._signal(  self.df,self.df_1h ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
@@ -92,7 +92,7 @@ class Data:
         
         
     def _dataConvert(self, ms):
-        df =self.df_15m
+        df =self.df
         df['TimeH'] = df.Time.apply(lambda x: x//ms)
         d= df.groupby(['TimeH']).agg({ 'Time':'min','Low':'min', 'High':'max',
          'Open':'first', 'Close':'last',"CloseTime":"last", 'Volum':'sum'}).reset_index()
@@ -101,6 +101,6 @@ class Data:
     
     def _writeData(self):
 
-         self.df_15m.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')      
+         self.df.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')      
         # self.df_1h.to_csv(base_path+'/data/obs/'+self.coin+'df_1h.csv')
         

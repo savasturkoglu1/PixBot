@@ -22,7 +22,7 @@ class GetData:
         self.look_back_short = look_back_short
 
         ## periods
-        self.periods = ['_15m'] #,'_30m','_1h','_5m','_15m'
+        self.periods = ['_1h'] #,'_30m','_1h','_5m','_15m'
         self.intervals = {
                     '_1m' : Client.KLINE_INTERVAL_1MINUTE,
                     '_5m' : Client.KLINE_INTERVAL_5MINUTE,
@@ -70,12 +70,12 @@ if __name__ == '__main__':
    
     
     from client import iClient
-    c = ['LTCUSDT','CHZUSDT','BCHUSDT','VETUSDT','XTZUSDT', 'DASHUSDT','HOTUSDT',
-'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT', 'FILUSDT'] 
-    
-    coins = ['ATOMUSDT','DOTUSDT', 'ADAUSDT', 'ETHUSDT', 'BTCUSDT','XRPUSDT'] #'ETHUSDT', 'DOTUSDT','XRPUSDT', #'BTCUSDT', 'AVAXUSDT', 'ADAUSDT', 'LTCUSDT', 'DOTUSDT','XRPUSDT'
-    for i in  ['ATOMUSDT']:
-    #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'XRPUSDT', 'ETHUSDT', 'BNBUSDT','BTCUSDT','AVAXUSDT']:
-    # ['LINKUSDT', 'ATOMUSDT', 'DOTUSDT']: #['DOTUSDT', 'LINKUSDT', 'ATOMUSDT', 'XLMUSDT', 'BNBUSDT']: #['XLMUSDT', 'ATOMUSDT', 'LINKUSDT', 'ETCUSDT']:
+
+    list = ['XLMUSDT','ATOMUSDT','DOTUSDT', 'ADAUSDT', 'ETHUSDT',
+     'BTCUSDT','XRPUSDT','LTCUSDT','CHZUSDT','BCHUSDT','VETUSDT',
+     'XTZUSDT', 'DASHUSDT','HOTUSDT',
+'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT', 'FILUSDT']
+    coins = ['ATOMUSDT','DOTUSDT', 'LINKUSDT', 'AVAXUSDT', 'XLMUSDT','XRPUSDT']
+    for i in coins :
         d = GetData(iClient().client,i)
         d._getData()       

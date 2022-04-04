@@ -43,8 +43,8 @@ class Logs():
             rfh = logging.handlers.RotatingFileHandler(
                 filename=file_n, 
                 mode='w',
-                maxBytes=5*1024*1024,
-                backupCount=10000,
+                maxBytes=3*1024*1024,
+                backupCount=10,
                 encoding=None,
                 delay=0
             )

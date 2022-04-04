@@ -38,7 +38,7 @@ class Strategy:
         self.Logs = Logs(self.coin)
 
         ## data framse        
-        self.df_15m = None
+        self.df = None
         self.df_30m = None
         self.df_1h = None
         self.df_5m = None
@@ -65,16 +65,16 @@ class Strategy:
         if self.position is None:
                 self.long_flag = False
                 self.short_flag = False
-    def _signal(self, df_15m, df_1h):
+    def _signal(self, df, df_1h):
 
         ## set data frames
         
-        self.df_15m = df_15m
-        self.df_1h = df_1h
+        self.df = df
+       
         
        
 
-        live = self.df_15m.iloc[-1].to_dict()
+        live = self.df.iloc[-1].to_dict()
 
         instant_pnl = 0
         position = None
@@ -87,11 +87,11 @@ class Strategy:
             position = 0
         
         
-        signal, leverage = self.Agent.signal(self.df_15m, instant_pnl, position)
+        signal, leverage = self.Agent.signal(self.df, instant_pnl, position)
 
         if signal !=2:
             
-            params = self._params(signal,self.df_15m, leverage)
+            params = self._params(signal,self.df, leverage)
 
             print(self.coin, params)
             self.Logs._writeLog(self.coin+'-agent order params   '+ str(params))   
@@ -125,7 +125,8 @@ class Strategy:
              row['trade_type'] = 'LONG'
              self.long_flag = True           
              self.entry_price = close             
-             self.stop_price =max(close-2*atr,close*0.97 )         
+             self.stop_price = max( df[['Close','Open']].iloc[-1:].values.min()*(1-.003),close*0.97 )
+             #max(close-2*atr,close*0.97 )         
              
         elif signal ==0  and  self.short_flag is False and self.long_flag is False:
 
@@ -134,16 +135,17 @@ class Strategy:
              row['trade_type'] = 'SHORT'
              self.short_flag = True        
              self.entry_price = close 
-             self.stop_price = min(close+2*atr, close*1.03)
+             self.stop_price = min(df[['Close','Open']].iloc[-1:].values.max()*1.003, close*1.03)   
+             #min(close+2*atr, close*1.03)
         
         if self.long_flag is True or self.short_flag is True:
            self.stop_limit = np.abs(close-self.stop_price)/close*100            
            
 
            if self.long_flag is True:
-                    take_profit = (1+self.stop_limit/100*3)*data['Close']
+                    take_profit = (1+self.stop_limit/100*5)*data['Close']
            if self.short_flag is True:
-                    take_profit =(1-self.stop_limit/100*3)*data['Close']
+                    take_profit =(1-self.stop_limit/100*5)*data['Close']
            row['leverage'] = leverage
            row['stop_limit'] = round(self.stop_limit,3)
            row['trailing_stop'] = False

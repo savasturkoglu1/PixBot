@@ -44,7 +44,7 @@ class Socket:
         
         self.bm.start()
         '''  start socket '''
-        self.connection_key =self.bm.start_kline_futures_socket( callback= self._process,symbol=self.coin, interval=Client.KLINE_INTERVAL_15MINUTE) #)
+        self.connection_key =self.bm.start_kline_futures_socket( callback= self._process,symbol=self.coin, interval=Client.KLINE_INTERVAL_1HOUR) #)
        # self.bm.start()
 
 

@@ -7,7 +7,7 @@ class Bot:
     def __init__(self):
         self.wsockets = {}
         self.client = iClient()
-        self.coins = [ 'ATOMUSDT'] # 'XLMUSDT', 'LINKUSDT', 
+        self.coins = [ 'ATOMUSDT','DOTUSDT', 'AVAXUSDT', 'LINKUSDT'] # 'XLMUSDT', 'LINKUSDT', 
         # #'ADAUSDT', 'DOTUSDT','XRPUSDT',,'ADAUSDT', 'DOTUSDT', 'XRPUSDT','XRPUSDT','ETHUSDT',
     
     def _runBot(self, market='all'):

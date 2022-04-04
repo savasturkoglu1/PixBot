@@ -18,7 +18,7 @@ class Agent:
            
              'candle':{
                  'name': 'candle',
-                 'model': 'rl_candle.pkl',              
+                 'model': 'rl_candle_1h_sstate.pkl',              
                  'states':2800,
                  'cluster':'candle_cluster.pkl',
 
@@ -80,36 +80,40 @@ class Agent:
             return 2,1
         state = int(s)
        
-        if position == 1:
-            state = state+self.state_size
-        elif position == 0:
-            state = state + self.state_size*2
+        # if position == 1:
+        #     state = state+self.state_size
+        # elif position == 0:
+        #     state = state + self.state_size*2
        
         action = np.argmax(self.q_table[state])
-        val = self.q_table[state,action]
+        target = self.q_table[state,action]
         
-        if val<=0:
+        if target<=0:
             action =2
         
         leverage = 1
-        if position is None:
-            if action !=2:
-                t = 0.2 if action == 1 else 0.18
-                v = self.q_table[state,action]
-                if v<t:
+        if action == 1:
+                    
+                    
+
+                self.expected_pnl = target
+                self.opposit = self.q_table[state,0]*-1
+                leverage = max(np.ceil(target/0.15),2)
+                if self.opposit/target<0.7:
                     action = 2
-                else:
-                    self.expected_pnl = v
-                    leverage = max(np.ceil(self.expected_pnl/0.35),2)
-        else:
-              if instant_pnl< self.expected_pnl*3:
-                          action = 2
-              
+        elif action == 0:
+          
+                self.expected_pnl = target
+                self.opposit = self.q_table[state,1]*-1
+                leverage = max(np.ceil(target/0.15),2)
+                if self.opposit/target<0.7:
+                        action = 2
+       
                 
         
 
 
        
-        print('agent', state, action, leverage, val, instant_pnl) 
+        print('agent', state, action, leverage, target, instant_pnl) 
         self.Logs._writeLog(self.coin+'-agent signals  --state: '+str(state)+'-- action:'+ str(action)+'-- leverage:'+ str(leverage)+'-- statevaluse:'+ str(val))      
         return action,leverage
