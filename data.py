@@ -61,7 +61,9 @@ class Data:
             self.Strategy._live(w)
             print(msg) 
         if close_candle:
-             
+             if int(self.df.iloc[-1].Time) == row['t']:
+                  self.df = self.df[:-1].copy().reset_index()
+            
              self.df = self.df.append(w, ignore_index=True )           
                              
                            
