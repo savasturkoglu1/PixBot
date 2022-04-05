@@ -26,20 +26,13 @@ class Data:
         self.df_30m = None
         self.df_1h = None
         self.df_1m = None
-              
-        
-
-        
         
         self.timer =0
         
 
     def _setDataframes(self):
         self.df = pd.read_csv(base_path+'/data/'+self.coin+'_1h.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum','CloseTime'])#
-        # self.df_5m = pd.read_csv(base_path+'/data/'+self.coin+'_5m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#   
-        # self.df = pd.read_csv(base_path+'/data/'+self.coin+'_15m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
-        # self.df_30m = pd.read_csv(base_path+'/data/'+self.coin+'_30m.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])# 
-        # self.df_1h = pd.read_csv(base_path+'/data/'+self.coin+'_1h.csv',usecols=['Time', 'Open','High' ,'Low', 'Close','Volum'])#
+      
        
 
 
@@ -51,10 +44,6 @@ class Data:
         resp = json.loads(json.dumps(msg))
         row = resp.get("k")
        
-
-        
-       
-        
         w = {
                 "Time" :int(row['t']),
                 "CloseTime":int(row['T']),
@@ -67,11 +56,6 @@ class Data:
             }
        
         close_candle = row['x']
-
-        # index_names = self.df_1m[ self.df_1m['Time'] == int(row['t']) ].index
-        # self.df_1m.drop(index_names, inplace = True)
-      
-        # self.df_1m = self.df_1m.append(w, ignore_index=True )
         
         if self.timer%120==0:
             self.Strategy._live(w)
@@ -79,7 +63,7 @@ class Data:
         if close_candle:
              
              self.df = self.df.append(w, ignore_index=True )           
-             #self.df_1h = self._dataConvert(3600000 )                      
+                             
                            
              self.Strategy._signal(  self.df,self.df_1h ) 
              
@@ -101,6 +85,6 @@ class Data:
     
     def _writeData(self):
 
-         self.df.to_csv(base_path+'/data/obs/'+self.coin+'df_15m.csv')      
+         self.df.to_csv(base_path+'/data/obs/'+self.coin+'_obs_1h.csv')      
         # self.df_1h.to_csv(base_path+'/data/obs/'+self.coin+'df_1h.csv')
         

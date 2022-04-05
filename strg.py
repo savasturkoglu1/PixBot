@@ -69,7 +69,7 @@ class Strategy:
 
         ## set data frames
         
-        self.df = df
+        self.df = df.copy().reset_index(drop=True)
        
         
        

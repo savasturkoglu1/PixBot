@@ -75,7 +75,7 @@ if __name__ == '__main__':
      'BTCUSDT','XRPUSDT','LTCUSDT','CHZUSDT','BCHUSDT','VETUSDT',
      'XTZUSDT', 'DASHUSDT','HOTUSDT',
 'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT', 'FILUSDT']
-    coins = ['ATOMUSDT','DOTUSDT', 'LINKUSDT', 'AVAXUSDT', 'XLMUSDT','XRPUSDT']
+    coins = ['ATOMUSDT','DOTUSDT', 'LINKUSDT', 'AVAXUSDT']
     for i in coins :
         d = GetData(iClient().client,i)
         d._getData()       
