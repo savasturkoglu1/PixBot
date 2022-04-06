@@ -143,9 +143,9 @@ class Strategy:
            
 
            if self.long_flag is True:
-                    take_profit = (1+self.stop_limit/100*4)*data['Close']
+                    take_profit = (1+self.stop_limit/100*3)*data['Close']
            if self.short_flag is True:
-                    take_profit =(1-self.stop_limit/100*4)*data['Close']
+                    take_profit =(1-self.stop_limit/100*3)*data['Close']
            row['leverage'] = leverage
            row['stop_limit'] = round(self.stop_limit,3)
            row['trailing_stop'] = False

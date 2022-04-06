@@ -98,7 +98,7 @@ class Agent:
 
                 self.expected_pnl = target
                 self.opposit = self.q_table[state,0]*-1
-                leverage = max(np.ceil(target/0.15),3)
+                leverage = max(np.ceil(target/0.15),4)
                 # if self.opposit/target<0.7:
                 #     action = 2
                 if self.opposit/target>0.7 and target>0.1:
@@ -109,7 +109,7 @@ class Agent:
           
                 self.expected_pnl = target
                 self.opposit = self.q_table[state,1]*-1
-                leverage = max(np.ceil(target/0.15),3)
+                leverage = max(np.ceil(target/0.15),4)
                 # if self.opposit/target<0.7:
                 #         action = 2
                 if self.opposit/target>0.7 and target>0.1:
