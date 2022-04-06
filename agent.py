@@ -97,25 +97,29 @@ class Agent:
                     
 
                 self.expected_pnl = target
-                self.opposit = self.q_table[state,0]*-1
-                leverage = max(np.ceil(target/0.15),4)
-                # if self.opposit/target<0.7:
+                opposit = self.q_table[state,0]
+                leverage = max(np.ceil(target/0.15),3)
+                # if opposit/target<0.7:
                 #     action = 2
-                if self.opposit/target>0.7 and target>0.1:
+                if opposit*-1/target<2.1 and target>0.15 and opposit<0 :
                     action = 1
                 else: 
                     action = 2
         elif action == 0:
           
                 self.expected_pnl = target
-                self.opposit = self.q_table[state,1]*-1
-                leverage = max(np.ceil(target/0.15),4)
-                # if self.opposit/target<0.7:
+                opposit = self.q_table[state,1]*-1
+                leverage = max(np.ceil(target/0.15),3)
+                # if opposit/target<0.7:
                 #         action = 2
-                if self.opposit/target>0.7 and target>0.1:
+                if opposit*-1/target<2.33 and target>0.15 and opposit<0 :
                     action = 0
                 else: 
                     action = 2
+
+        if position is not None:
+            if instant_pnl<self.expected_pnl:
+                action = 2
        
                 
         

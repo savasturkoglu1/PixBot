@@ -125,7 +125,7 @@ class Strategy:
              row['trade_type'] = 'LONG'
              self.long_flag = True           
              self.entry_price = close             
-             self.stop_price = max( df[['Close','Open']].iloc[-1:].values.min()*(1-.003),close*0.97 )
+             self.stop_price = max( df[['Close','Open']].iloc[-1:].values.min()*(1-.0035),close*0.97 )
              #max(close-2*atr,close*0.97 )         
              
         elif signal ==0  and  self.short_flag is False and self.long_flag is False:
@@ -135,7 +135,7 @@ class Strategy:
              row['trade_type'] = 'SHORT'
              self.short_flag = True        
              self.entry_price = close 
-             self.stop_price = min(df[['Close','Open']].iloc[-1:].values.max()*1.003, close*1.03)   
+             self.stop_price = min(df[['Close','Open']].iloc[-1:].values.max()*1.0035, close*1.03)   
              #min(close+2*atr, close*1.03)
         
         if self.long_flag is True or self.short_flag is True:
