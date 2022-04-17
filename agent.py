@@ -70,6 +70,7 @@ class Agent:
             df['np'] = (df.Close-min_)/(max_-min_)
             df['npma'] = talib.SMA(df.np, 5)
             df['state'] = self.getState(df.npma.to_numpy(),96)
+            return df
 
     def loadModel(self):
         with open(self.storage_path+self.model['model'], 'rb') as fid: #_gaus4var
