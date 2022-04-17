@@ -79,8 +79,8 @@ class Trade:
        # print(self.symbol, self.position, self.quantity)
         if self.order is not  None:
             
-            # if self.orderStatus !='FILLED':
-            #     self._checkOrder()
+            if self.order is not None and self.orderStatus !='FILLED':
+                self._checkOrder()
             if self.setStopStatus is False:
                 self._setStop()
             if self.takeProfitStatus is False:
@@ -103,9 +103,9 @@ class Trade:
                 symbol=self.symbol, 
                 quantity=self.quantity, 
                 side=Client.SIDE_BUY,
-                type='MARKET',
-               # timeInForce=Client.TIME_IN_FORCE_GTC,                
-               # price = kwargs['price']
+                type='LIMIT',
+                timeInForce=Client.TIME_IN_FORCE_GTC,                
+                price = kwargs['price']
                 )
         
         if kwargs['order_type'] == 'OPEN_SHORT':
@@ -117,9 +117,9 @@ class Trade:
                 symbol=self.symbol, 
                 quantity=self.quantity, 
                 side=Client.SIDE_SELL,
-                type='MARKET',
-                #timeInForce=Client.TIME_IN_FORCE_GTC,                
-               # price = kwargs['open_short']
+                type='LIMIT',
+                timeInForce=Client.TIME_IN_FORCE_GTC,                
+                price = kwargs['open_short']
                 )
         if kwargs['order_type'] == 'CLOSE_LONG':
             if self.position != 1:

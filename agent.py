@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from env import base_path 
 from logger import Logs
+from dtw import DTWGridCluster
 class Agent:
     
     def __init__(self, coin):
@@ -13,24 +14,28 @@ class Agent:
         self.cols =  list(talib.get_function_groups()['Pattern Recognition']) 
         self.coin = coin
         self.Logs = Logs(self.coin)
+        self.ClusterModel = DTWGridCluster()
+        self.ClusterModel.loadModel('grid_dtw_npma_96')
 
         self.models = {
-           
-             'candle':{
+          
+             'dtw':{
                  'name': 'candle',
-                 'model': 'rl_candle_1h_sstate.pkl',              
-                 'states':2800,
+                 'model': 'rl_dtw_96_multi_state_.pkl',              
+                 'states':1600,
                  'cluster':'candle_cluster.pkl',
 
              }
          }
         
-        self.model = self.models['candle']
+        self.model = self.models['dtw']
         self.state_size = self.model['states']+1
 
         self.q_table = None
         self.t_table = None
         self.q_matrix = None
+        self.s_table  = None
+        self.s_trade = None
         
        
         self.loadModel()
@@ -38,52 +43,58 @@ class Agent:
         ## trade vals
         self.state_list= []
         self.expected_pnl = 0
-    def candlestick(self,df):
-        
 
-            op = df['Open'].astype(float)
-            hi = df['High'].astype(float)
-            lo = df['Low'].astype(float)
-            cl = df['Close'].astype(float)
-
-            candle_names = talib.get_function_groups()['Pattern Recognition']
-
-          
-
+    def getState(self,input_data,n_past):
+            X = list()
+            for window_start in range(len(input_data)):              
+              past_end = window_start + n_past
             
-            # create columns for each candle
-            for candle in candle_names:
-                # below is same as;
-                # df["CDL3LINESTRIKE"] = talib.CDL3LINESTRIKE(op, hi, lo, cl)
-                df[candle] = getattr(talib, candle)(op, hi, lo, cl)
-            return df
+              if past_end > len(input_data):
+                break
+            
+              past   = input_data[window_start:past_end]
+              
+              X.append(past)
+            X =np.array(X)
+            
+           # X = X.reshape(X.shape[0], -1)
+           
+            p =  self.ClusterModel.predict(X)
+            st = np.append([np.nan]*(n_past-1), p)
+            return st
+    
     def data(self, df):
-        df =self.candlestick(df)
-        df = pd.merge(df, self.candle_cluster,how='left',  on=talib.get_function_groups()['Pattern Recognition'])
-       # df = df.dropna().reset_index(drop=True)
-        return df
+            df['atr'] = talib.ATR(df.High, df.Low, df.Close, timeperiod=14)            
+            max_ = talib.MAX(df.Close, timeperiod=200)
+            min_ = talib.MIN(df.Close, timeperiod=200)
+            df['np'] = (df.Close-min_)/(max_-min_)
+            df['npma'] = talib.SMA(df.np, 5)
+            df['state'] = self.getState(df.npma.to_numpy(),96)
 
     def loadModel(self):
         with open(self.storage_path+self.model['model'], 'rb') as fid: #_gaus4var
             model = pickle.load(fid)
-       
+        #model = model[self.coin]   
         self.q_table = model['q_table']
         self.t_table = model['t_table']
+        self.s_table = model['s_table']
+        self.s_trade = model['s_trade']
       
     def signal(self, df, instant_pnl, position):
         
         df = self.data(df)
 
         s = df.iloc[-1].state
+        data = df.iloc[-1].to_dict()
         if s !=s:
             print(s)
             return 2,1
         state = int(s)
        
-        # if position == 1:
-        #     state = state+self.state_size
-        # elif position == 0:
-        #     state = state + self.state_size*2
+        if position == 1:
+            state = state+self.state_size
+        elif position == 0:
+            state = state + self.state_size*2
        
         action = np.argmax(self.q_table[state])
         target = self.q_table[state,action]
@@ -91,33 +102,46 @@ class Agent:
         if target<=0:
             action =2
         
-        leverage = 1
-        if action == 1:
-                    
-                    
+        if position == 1:
+            state = state+self.state_size
+        elif position == 0:
+            state = state + self.state_size*2
+       
+        action = np.argmax(self.q_table[state])
+        target = self.q_table[state,action]
 
-                self.expected_pnl = target
-                opposit = self.q_table[state,0]
-                leverage = max(np.ceil(target/0.15),3)
-                
-                if  target>0.15 and opposit<0 :
-                    action = 1
-                else: 
-                    action = 2
-        elif action == 0:
-          
-                self.expected_pnl = target
-                opposit = self.q_table[state,1]
-                leverage = max(np.ceil(target/0.15),3)
-               
-                if  target>0.15 and opposit<0 :
-                    action = 0
-                else: 
-                    action = 2
+        leverage = 2
+        
+        expected_pnl =0
+        if action !=2:
+            expected_pnl = self.s_trade[state,action*2]
+            risk =min(self.s_trade[state,action*2+1], 1)
 
-        # if position is not None:
-        #     if instant_pnl<self.expected_pnl:
-        #         action = 2
+            
+            tresh = 0.5 if action ==1 else 0.35
+            if target<tresh :
+                action = 2
+            else:
+                self.expected_pnl = target
+                leverage = min(max(np.ceil(expected_pnl/risk*2),2),10)
+        
+       
+        if action == 1 :
+            if data['npma']<0.8:# and data['Close']>data['Open'] :
+                action = 1
+            else:
+                action = 2
+        
+        if action ==0 :
+            if  data['npma']>0.2:# and data['Close']<data['Open'] :
+                action == 0
+            else: action =2
+        
+        
+
+        if position is not None:
+            if instant_pnl<self.expected_pnl:
+                 action = 2
        
                 
         

@@ -65,7 +65,7 @@ class Strategy:
         if self.position is None:
                 self.long_flag = False
                 self.short_flag = False
-    def _signal(self, df, df_1h):
+    def _signal(self, df):
 
         ## set data frames
         
@@ -120,22 +120,24 @@ class Strategy:
             self.entry_price = None
 
         elif signal == 1  and self.long_flag is False and  self.short_flag is False:
-             row['price'] = round(close, self.prc[self.coin])
+             row['price'] = round(close*1.0025 , self.prc[self.coin])
              row['order_type'] = 'OPEN_LONG'
              row['trade_type'] = 'LONG'
              self.long_flag = True           
-             self.entry_price = close             
-             self.stop_price = max( df[['Close','Open']].iloc[-1:].values.min()*(1-.0035),close*0.97 )
+             self.entry_price = close            
+             self.stop_price = max(close-2*atr,close*0.97 ) 
+             #max( df[['Close','Open']].iloc[-1:].values.min()*(1-.0035),close*0.97 )
              #max(close-2*atr,close*0.97 )         
              
         elif signal ==0  and  self.short_flag is False and self.long_flag is False:
 
-             row['price'] = round(close, self.prc[self.coin])
+             row['price'] = round(close*0.9975, self.prc[self.coin])
              row['order_type'] = 'OPEN_SHORT'
              row['trade_type'] = 'SHORT'
              self.short_flag = True        
-             self.entry_price = close 
-             self.stop_price = min(df[['Close','Open']].iloc[-1:].values.max()*1.0035, close*1.03)   
+             self.entry_price = close
+             self.stop_price =min(close+2*atr, close*1.03)
+             # min(df[['Close','Open']].iloc[-1:].values.max()*1.0035, close*1.03)   
              #min(close+2*atr, close*1.03)
         
         if self.long_flag is True or self.short_flag is True:

@@ -22,7 +22,7 @@ class GetData:
         self.look_back_short = look_back_short
 
         ## periods
-        self.periods = ['_1h'] #,'_30m','_1h','_5m','_15m'
+        self.periods = ['_15m'] #,'_30m','_1h','_5m','_15m'
         self.intervals = {
                     '_1m' : Client.KLINE_INTERVAL_1MINUTE,
                     '_5m' : Client.KLINE_INTERVAL_5MINUTE,

@@ -67,7 +67,7 @@ class Data:
              self.df = self.df.append(w, ignore_index=True )           
                              
                            
-             self.Strategy._signal(  self.df,self.df_1h ) 
+             self.Strategy._signal(  self.df ) 
              
              self.time = row['t']
              time = datetime.utcfromtimestamp(int(self.time//1000)).strftime("%Y-%m-%d %H:%M:%S")
