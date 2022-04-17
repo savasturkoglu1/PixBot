@@ -110,7 +110,7 @@ class Agent:
         action = np.argmax(self.q_table[state])
         target = self.q_table[state,action]
 
-        leverage = 2
+        leverage = 3
         
         expected_pnl =0
         if action !=2:
@@ -123,7 +123,7 @@ class Agent:
                 action = 2
             else:
                 self.expected_pnl = target
-                leverage = min(max(np.ceil(expected_pnl/risk*2),2),10)
+               # leverage = min(max(np.ceil(expected_pnl/risk*2),2),10)
         
        
         if action == 1 :
