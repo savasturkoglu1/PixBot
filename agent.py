@@ -11,7 +11,7 @@ class Agent:
         self.storage_path = base_path+"/source/model/"
         self.candle_cluster = pd.read_csv(self.storage_path+'candle_cluster.csv', low_memory=False)
         
-        self.cols =  list(talib.get_function_groups()['Pattern Recognition']) 
+     
         self.coin = coin
         self.Logs = Logs(self.coin)
         self.ClusterModel = DTWGridCluster()
