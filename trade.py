@@ -17,7 +17,7 @@ class Trade:
         self.symbol = coin
     
         ## order constants
-        self.marginRate = 0.30
+        self.marginRate = 0.325
         self.stopRate = 2
         self.profitRate = 7
         
@@ -81,15 +81,15 @@ class Trade:
             
             if self.order is not None and self.orderStatus !='FILLED':
                 self._checkOrder()
-            # if self.setStopStatus is False:
-            #     self._setStop()
-            # if self.takeProfitStatus is False:
-            #     self._takeProfit()
-            # self._checkPosition()
-            # if self.takeProfitStatus is True:
-            #     self._checkProfit()
-            # if self.setStopStatus is True:
-            #     self._checkStop()    
+            if self.setStopStatus is False:
+                self._setStop()
+            if self.takeProfitStatus is False:
+                self._takeProfit()
+            self._checkPosition()
+            if self.takeProfitStatus is True:
+                self._checkProfit()
+            if self.setStopStatus is True:
+                self._checkStop()    
     def _order(self, **kwargs):
         self._checkPosition()
         params = None

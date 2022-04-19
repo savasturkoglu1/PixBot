@@ -103,13 +103,7 @@ class Agent:
         if target<=0:
             action =2
         
-        if position == 1:
-            state = state+self.state_size
-        elif position == 0:
-            state = state + self.state_size*2
-       
-        action = np.argmax(self.q_table[state])
-        target = self.q_table[state,action]
+      
 
         leverage = 3
         
