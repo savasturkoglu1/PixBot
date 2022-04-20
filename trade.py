@@ -119,7 +119,7 @@ class Trade:
                 side=Client.SIDE_SELL,
                 type='LIMIT',
                 timeInForce=Client.TIME_IN_FORCE_GTC,                
-                price = kwargs['open_short']
+                price = kwargs['price']
                 )
         if kwargs['order_type'] == 'CLOSE_LONG':
             if self.position != 1:
