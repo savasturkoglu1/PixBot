@@ -79,8 +79,8 @@ class Trade:
        # print(self.symbol, self.position, self.quantity)
         if self.order is not  None:
             
-            if self.order is not None and self.orderStatus !='FILLED':
-                self._checkOrder()
+            # if self.order is not None and self.orderStatus !='FILLED':
+            #     self._checkOrder()
             if self.setStopStatus is False:
                 self._setStop()
             if self.takeProfitStatus is False:

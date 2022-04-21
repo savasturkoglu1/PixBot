@@ -59,7 +59,7 @@ class Strategy:
         self.position = None
         self.entry_price = None
     def _live(self, data):
-        self.Trade._live(self.live)        
+        self.Trade._live(data)        
 
         self.position = self.Trade.position
         if self.position is None:
@@ -70,7 +70,11 @@ class Strategy:
         ## set data frames
         
         self.df = df.copy().reset_index(drop=True)
-       
+        
+        self.position = self.Trade.position
+        if self.position is None:
+                self.long_flag = False
+                self.short_flag = False
         
        
 
