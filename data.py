@@ -57,7 +57,8 @@ class Data:
        
         close_candle = row['x']
         
-        if self.timer%120==0:
+        if self.timer%240==0:
+            print('test')
             self.Strategy._live(w)
             print(msg) 
         if close_candle:

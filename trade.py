@@ -45,7 +45,7 @@ class Trade:
         
         ## trade order
         
-        self.order = None
+        
         self.balance = 0
         self.tradeMargin =0
         self.quantity = 0        
@@ -76,20 +76,18 @@ class Trade:
         
 
     def _live(self, data):
-       # print(self.symbol, self.position, self.quantity)
-        if self.order is not  None:
-            
+        
             # if self.order is not None and self.orderStatus !='FILLED':
             #     self._checkOrder()
-            if self.setStopStatus is False:
-                self._setStop()
-            if self.takeProfitStatus is False:
-                self._takeProfit()
+            # if self.setStopStatus is False:
+            #     self._setStop()
+            # if self.takeProfitStatus is False:
+            #     self._takeProfit()
             self._checkPosition()
-            if self.takeProfitStatus is True:
-                self._checkProfit()
-            if self.setStopStatus is True:
-                self._checkStop()    
+            # if self.takeProfitStatus is True:
+            #     self._checkProfit()
+            # if self.setStopStatus is True:
+            #     self._checkStop()    
     def _order(self, **kwargs):
         self._checkPosition()
         params = None
@@ -345,10 +343,12 @@ class Trade:
                 self.quantity = np.abs(float(p[0]['positionAmt']))
             elif float(p[0]['positionAmt']) >0 :
                 self.position =1 
-                self.quantity = np.abs(float(p[0]['positionAmt']))     
+                self.quantity = np.abs(float(p[0]['positionAmt']))  
+                   
             else:
                 self.position = None
                 self._clearTrade()
+                print(self.symbol, 'no position')
             
         except BinanceAPIException as e:
                  self.Logs._writeLog('order error  '+ str(e))
