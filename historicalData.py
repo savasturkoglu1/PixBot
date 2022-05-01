@@ -12,7 +12,7 @@ from env  import base_path
 
 class GetData:
 
-    def __init__(self, client,coin,look_back=700, look_back_short=1):
+    def __init__(self, client,coin,look_back=240, look_back_short=1):
 
         self.client = client
         self.coin   = coin
@@ -57,7 +57,7 @@ class GetData:
             back= self.from_date_back
             # if period in self.periods[:2]:
             #     back = self.from_date_back_short
-            path = self.file_path+self.coin+period+'_long.csv'
+            path = self.file_path+self.coin+period+'_mid.csv'
             print(self.coin, self.intervals[period], back)
             data_ = self.client.futures_historical_klines(self.coin, self.intervals[period], back)  
             df = pd.DataFrame(data_)
@@ -75,7 +75,7 @@ if __name__ == '__main__':
      'BTCUSDT','XRPUSDT','LTCUSDT','CHZUSDT','BCHUSDT','VETUSDT',
      'XTZUSDT', 'DASHUSDT','HOTUSDT',
 'NEOUSDT','ATOMUSDT', 'BTTUSDT', 'SOLUSDT', 'EOSUSDT', 'FILUSDT']
-    coins =['XRPUSDT'] # ['XRPUSDT','ATOMUSDT','DOTUSDT',  'AVAXUSDT']
+    coins =['XRPUSDT','ATOMUSDT','DOTUSDT',  'AVAXUSDT']
     for i in coins :
         d = GetData(iClient().client,i)
         d._getData()       

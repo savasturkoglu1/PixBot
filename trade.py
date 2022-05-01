@@ -160,6 +160,8 @@ class Trade:
                 if True:#order['status'] == 'FILLED':
                                             
                             self._setStop()
+                            if self.symbol == 'ATOMUSDT':
+                                 self._setStop(type='TRAILING_STOP_MARKET')
                             if self.takeProfit is True:
                                self._takeProfit() 
                 else :
@@ -221,7 +223,7 @@ class Trade:
                             quantity=self.quantity, 
                             side= self.triggerSide,
                             type='TRAILING_STOP_MARKET',
-                            callbackRate=self.stopLimit
+                            callbackRate=self.stopLimit*1.3
                             #price = self.stopPrice,           
                             #stopPrice = self.stopPrice
                             #timeInForce=Client.TIME_IN_FORCE_GTC
