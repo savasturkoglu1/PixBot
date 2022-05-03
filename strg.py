@@ -79,7 +79,7 @@ class Strategy:
         self.position = self.Trade.position
         if self.position is None:
                 self.long_flag = False
-                self.short_flag = False
+                self.short_flag = False 
         elif self.position == 1:
                self.long_flag = True
         elif self.position == 0:
