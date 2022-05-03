@@ -65,6 +65,11 @@ class Strategy:
         if self.position is None:
                 self.long_flag = False
                 self.short_flag = False
+        elif self.position == 1:
+               self.long_flag = True
+        elif self.position == 0:
+              self.short_flag = True
+            
     def _signal(self, df):
 
         ## set data frames
@@ -75,6 +80,10 @@ class Strategy:
         if self.position is None:
                 self.long_flag = False
                 self.short_flag = False
+        elif self.position == 1:
+               self.long_flag = True
+        elif self.position == 0:
+              self.short_flag = True
         
        
 

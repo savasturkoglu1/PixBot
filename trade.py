@@ -223,7 +223,7 @@ class Trade:
                             quantity=self.quantity, 
                             side= self.triggerSide,
                             type='TRAILING_STOP_MARKET',
-                            callbackRate=self.stopLimit*1.3
+                            callbackRate= min(self.stopLimit*1.1, 5)
                             #price = self.stopPrice,           
                             #stopPrice = self.stopPrice
                             #timeInForce=Client.TIME_IN_FORCE_GTC
