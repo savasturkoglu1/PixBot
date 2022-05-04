@@ -159,9 +159,12 @@ class Trade:
                 self.position = 1 if order_type == 'OPEN_LONG' else 0    
                 if True:#order['status'] == 'FILLED':
                                             
-                            self._setStop()
+                            
                             if self.symbol == 'ATOMUSDT':
                                  self._setStop(typ='TRAILING_STOP_MARKET')
+                            else:
+                                self._setStop()
+
                             if self.takeProfit is True:
                                self._takeProfit() 
                 else :
