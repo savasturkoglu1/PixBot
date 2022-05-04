@@ -45,7 +45,7 @@ class Trade:
         
         ## trade order
         
-        
+        self.entry_price = None
         self.balance = 0
         self.tradeMargin =0
         self.quantity = 0        
@@ -294,6 +294,7 @@ class Trade:
         self.profitLimit = 0
         self.profitPrice = None
         self.stopPrice = None
+        self.entry_price = None
       
        # self._cancelOrder(self.stopOrder)
        
@@ -343,9 +344,11 @@ class Trade:
             if  float(p[0]['positionAmt']) < 0:
                 self.position =0
                 self.quantity = np.abs(float(p[0]['positionAmt']))
+                self.entry_price = np.abs(float(p[0]['entryPrice']))
             elif float(p[0]['positionAmt']) >0 :
                 self.position =1 
-                self.quantity = np.abs(float(p[0]['positionAmt']))  
+                self.quantity = np.abs(float(p[0]['positionAmt']))
+                self.entry_price = np.abs(float(p[0]['entryPrice']))
                    
             else:
                 self.position = None

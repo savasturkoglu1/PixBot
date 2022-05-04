@@ -67,8 +67,10 @@ class Strategy:
                 self.short_flag = False
         elif self.position == 1:
                self.long_flag = True
+               self.entry_price = self.Trade.entry_price
         elif self.position == 0:
               self.short_flag = True
+              self.entry_price = self.Trade.entry_price
             
     def _signal(self, df):
 
