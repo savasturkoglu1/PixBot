@@ -161,7 +161,7 @@ class Trade:
                                             
                             self._setStop()
                             if self.symbol == 'ATOMUSDT':
-                                 self._setStop(type='TRAILING_STOP_MARKET')
+                                 self._setStop(typ='TRAILING_STOP_MARKET')
                             if self.takeProfit is True:
                                self._takeProfit() 
                 else :
