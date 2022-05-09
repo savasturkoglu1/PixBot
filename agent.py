@@ -121,13 +121,13 @@ class Agent:
                # leverage = min(max(np.ceil(expected_pnl/risk*2),2),10)
         
        
-        if action == 1 :
+        if action == 1 and target<1.21:
             if data['npma']<0.8:# and data['Close']>data['Open'] :
                 action = 1
             else:
                 action = 2
         
-        if action ==0 :
+        if action ==0 and target<1.21:
             if  data['npma']>0.2:# and data['Close']<data['Open'] :
                 action == 0
             else: action =2
