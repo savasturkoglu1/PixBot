@@ -160,10 +160,12 @@ class Trade:
                 if True:#order['status'] == 'FILLED':
                                             
                             
+                            # if self.symbol == 'ATOMUSDT':
+                            #      self._setStop(typ='TRAILING_STOP_MARKET')
+                            # else:
+                            self._setStop()
                             if self.symbol == 'ATOMUSDT':
                                  self._setStop(typ='TRAILING_STOP_MARKET')
-                            else:
-                                self._setStop()
 
                             if self.takeProfit is True:
                                self._takeProfit() 
